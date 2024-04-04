@@ -82,5 +82,20 @@ namespace School.API.Controllers
                 return StatusCode(500, ex);
             }
         }
+
+        [HttpPost]
+        [Route("changeStatusEnquiryStudent/{id}")]
+        public IActionResult ChangeStatusEnquiryStudent(int id, bool status)
+        {
+            try
+            {
+                var res = _enquiry.updateStatusEnquiryStudent(id,status);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
     }
 }

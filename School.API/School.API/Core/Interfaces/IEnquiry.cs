@@ -10,5 +10,6 @@ namespace School.API.Core.Interfaces
         Task<Enquiry> create(CreateEnquiryRequestModel enquiry);
         Task<bool> update(CreateEnquiryRequestModel enquiry);
         Task<bool> entranceExamFee(PaymentsEnquiry paymentsEnquiry);
+        string updateStatusEnquiryStudent(int id, bool status);
     }
 }

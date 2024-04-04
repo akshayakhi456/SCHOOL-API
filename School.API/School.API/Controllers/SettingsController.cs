@@ -207,5 +207,65 @@ namespace School.API.Controllers
                 return StatusCode(500, ex);
             }
         }
+
+        [HttpPost]
+        [Route("ChangeStatusEnquiryQuestion/{id}")]
+        public IActionResult ChangeStatusEnquiryQuestion(int id, bool status)
+        {
+            try
+            {
+                var res = _settings.updateStatusEnquiryQuestion(id,status);
+                return CreatedAtAction(nameof(GetClass), new { message = res });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("paymentAllotment/{className}")]
+        public IActionResult GetPaymentAllotment(string className)
+        {
+            try
+            {
+                var res = _settings.GetPaymentAllotments(className);
+                return CreatedAtAction(nameof(GetClass), new { result = res });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpPost]
+        [Route("paymentAllotment")]
+        public IActionResult CreatePaymentAllotment(PaymentAllotment paymentAllotment)
+        {
+            try
+            {
+                var res = _settings.createPaymentAllotment(paymentAllotment);
+                return CreatedAtAction(nameof(GetClass), new { message = res });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpPut]
+        [Route("paymentAllotment")]
+        public IActionResult UpdatePaymentAllotment(PaymentAllotment paymentAllotment)
+        {
+            try
+            {
+                var res = _settings.updatePaymentAllotment(paymentAllotment);
+                return CreatedAtAction(nameof(GetClass), new { message = res });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
     }
 }

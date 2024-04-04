@@ -89,5 +89,12 @@ namespace School.API.Core.Services
             _applicationDbContext.SaveChanges(); 
             return Task.FromResult(true);
         }
+
+        public string updateStatusEnquiryStudent(int id, bool status)
+        {
+            var rec = _applicationDbContext.Enquiry.Where(x => x.id == id).FirstOrDefault();
+            rec.status = status;
+            return "Updated Successfully";
+        }
     }
 }

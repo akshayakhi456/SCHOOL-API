@@ -29,5 +29,7 @@ namespace School.API.Core.DbContext
         public virtual DbSet<Section> section { get; set; }
         public virtual DbSet<EnquiryQuestions> enquiryQuestions { get; set; }
 
+        public virtual DbSet<PaymentAllotment> paymentAllotments { get; set; }
+
     }
 }

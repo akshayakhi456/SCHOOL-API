@@ -112,5 +112,41 @@ namespace School.API.Core.Services
             var list = _applicationDbContext.enquiryQuestions.ToList();
             return list;
         }
+
+        public string updateStatusEnquiryQuestion(int id, bool status)
+        {
+            var rec = _applicationDbContext.enquiryQuestions.Where(x => x.id == id).FirstOrDefault();
+            rec.status = status;
+            _applicationDbContext.SaveChanges();
+            return "Updated Successfully";
+        }
+
+        public List<PaymentAllotment> GetPaymentAllotments(string className)
+        {
+            return _applicationDbContext.paymentAllotments.Where(x =>x.className == className).ToList();
+        }
+
+        public string createPaymentAllotment(PaymentAllotment paymentAllotment) 
+        {
+            var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.className == paymentAllotment.className);
+            if (isExistPayment)
+            {
+                return "Already Payment Name Exist";
+            }
+            _applicationDbContext.paymentAllotments.Add(paymentAllotment);
+            _applicationDbContext.SaveChanges();
+            return "Created Successully";
+        }
+        public string updatePaymentAllotment(PaymentAllotment paymentAllotment)
+        {
+            var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.className == paymentAllotment.className && x.id != paymentAllotment.id);
+            if (isExistPayment)
+            {
+                return "Already Payment Name Exist";
+            }
+            _applicationDbContext.paymentAllotments.Update(paymentAllotment);
+            _applicationDbContext.SaveChanges();
+            return "Updated Successfully";
+        }
     }
 }

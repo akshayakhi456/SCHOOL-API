@@ -18,5 +18,9 @@ namespace School.API.Core.Interfaces
         List<EnquiryQuestions> getAllEnquiryQuestion();
         string createEnquiryQuestion(EnquiryQuestions enquiryQuestions);
         string updateEnquiryQuestion(EnquiryQuestions enquiryQuestions);
+        string updateStatusEnquiryQuestion(int id,bool status);
+        List<PaymentAllotment> GetPaymentAllotments(string className);
+        string createPaymentAllotment(PaymentAllotment paymentAllotment);
+        string updatePaymentAllotment(PaymentAllotment PaymentAllotment);
     }
 }

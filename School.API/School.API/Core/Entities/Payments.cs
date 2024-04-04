@@ -7,7 +7,7 @@ namespace School.API.Core.Entities
         [Key]
         public int invoiceId { get; set; }
         [Required]
-        public string feeName { get; set; }
+        public string paymentName { get; set; }
         [Required]
         public string paymentType { get; set;}
         [Required]
