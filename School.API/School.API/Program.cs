@@ -75,6 +75,7 @@ builder.Services.AddScoped<IStudent, StudentService>();
 builder.Services.AddScoped<IEnquiry, EnquiryService>();
 builder.Services.AddScoped<IExpenses, ExpensesService>();
 builder.Services.AddScoped<IPayment, PaymentService>();
+builder.Services.AddScoped<ISettings, SettingsService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

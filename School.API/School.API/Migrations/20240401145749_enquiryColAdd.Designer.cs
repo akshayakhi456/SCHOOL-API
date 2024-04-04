@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using School.API.Core.DbContext;
 
@@ -11,9 +12,11 @@ using School.API.Core.DbContext;
 namespace School.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240401145749_enquiryColAdd")]
+    partial class enquiryColAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,23 +231,6 @@ namespace School.API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("School.API.Core.Entities.Classes", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("className")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("classes");
-                });
-
             modelBuilder.Entity("School.API.Core.Entities.Enquiry", b =>
                 {
                     b.Property<int>("id")
@@ -331,44 +317,6 @@ namespace School.API.Migrations
                     b.HasKey("id");
 
                     b.ToTable("EnquiryEntranceExams");
-                });
-
-            modelBuilder.Entity("School.API.Core.Entities.EnquiryQuestions", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("formControlName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isMultiple")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("options")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("question")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("status")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("enquiryQuestions");
                 });
 
             modelBuilder.Entity("School.API.Core.Entities.Expenses", b =>
@@ -509,27 +457,6 @@ namespace School.API.Migrations
                     b.HasKey("invoiceId");
 
                     b.ToTable("paymentsEnquiry");
-                });
-
-            modelBuilder.Entity("School.API.Core.Entities.Section", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("className")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("section")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("section");
                 });
 
             modelBuilder.Entity("School.API.Core.Entities.StudentAddress", b =>

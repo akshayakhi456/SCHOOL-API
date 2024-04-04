@@ -25,5 +25,9 @@ namespace School.API.Core.DbContext
         public virtual DbSet<EnquiryEntranceExam> EnquiryEntranceExams { get; set; }
         public virtual DbSet<PaymentsEnquiry> paymentsEnquiry { get; set; }
 
+        public virtual DbSet<Classes> classes { get; set; }
+        public virtual DbSet<Section> section { get; set; }
+        public virtual DbSet<EnquiryQuestions> enquiryQuestions { get; set; }
+
     }
 }

@@ -3,17 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace School.API.Core.Entities
 {
-    public class Expenses
+    public class Classes
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
-        [Required]
-        public string miscellanous { get; set; }
-        [Required]
-        public string doe { get; set; }
-        [Required] 
-        public long amount { get; set; }
-        public string remarks { get; set; }
+        public string className { get; set; }
     }
 }

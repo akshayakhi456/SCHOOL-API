@@ -8,6 +8,6 @@ namespace School.API.Core.Interfaces
         Task<StudentGuardianRequest> StudentById(int id);
         Task<List<Students>> list();
         Task<bool> create(StudentGuardianRequest student);
-        Task<bool> update(Students student);
+        Task<bool> update(StudentGuardianRequest student);
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace School.API.Core.Entities
 {
     public class Enquiry
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
         [Required]
@@ -27,7 +29,8 @@ namespace School.API.Core.Entities
         public bool status { get; set; }
         [Required]
         public string previousSchoolName { get; set; }
-
-
+        public string? parentInteraction { get; set; }
+        public int? rating { get; set; }
+        public string? review { get; set; }
     }
 }

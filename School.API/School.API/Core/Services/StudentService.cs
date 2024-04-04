@@ -54,9 +54,23 @@ namespace School.API.Core.Services
             return sgr;
         }
 
-        public Task<bool> update(Students student)
+        public async Task<bool> update(StudentGuardianRequest student)
         {
-            throw new NotImplementedException();
+            //var stdRecord = _applicationDbContext.Students.FirstOrDefault(std => std.id == student.students.id);
+            _applicationDbContext.Students.Update(student.students);
+            await _applicationDbContext.SaveChangesAsync();
+
+            if (student.guardians.Count() > 0)
+            {
+                foreach (var item in student.guardians) { 
+                    _applicationDbContext.Guardians.Update(item);
+                }
+                await _applicationDbContext.SaveChangesAsync();
+            }
+
+            _applicationDbContext.StudentAddresses.Update(student.address);
+            await _applicationDbContext.SaveChangesAsync();
+            return true;
         }
 
         public byte[] GetImage(string sBase64String)

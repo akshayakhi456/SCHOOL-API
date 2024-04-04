@@ -7,7 +7,7 @@ namespace School.API.Core.Interfaces
     {
         Task<EnquiryResponseModel> EnquiryById(int id);
         Task<List<Enquiry>> list();
-        Task<bool> create(CreateEnquiryRequestModel enquiry);
+        Task<Enquiry> create(CreateEnquiryRequestModel enquiry);
         Task<bool> update(CreateEnquiryRequestModel enquiry);
         Task<bool> entranceExamFee(PaymentsEnquiry paymentsEnquiry);
     }

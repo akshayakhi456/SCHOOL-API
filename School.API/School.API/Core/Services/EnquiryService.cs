@@ -15,7 +15,7 @@ namespace School.API.Core.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<bool> create(CreateEnquiryRequestModel createEnquiryRequestModel)
+        public Task<Enquiry> create(CreateEnquiryRequestModel createEnquiryRequestModel)
         {
            _applicationDbContext.Enquiry.Add(createEnquiryRequestModel.enquiry);
             _applicationDbContext.SaveChanges();
@@ -25,7 +25,7 @@ namespace School.API.Core.Services
                 _applicationDbContext.EnquiryEntranceExams.Add(createEnquiryRequestModel.enquiryEntranceExam);
                 _applicationDbContext.SaveChanges();
             }
-            return Task.FromResult(true);
+            return Task.FromResult(createEnquiryRequestModel.enquiry);
         }
 
         public Task<EnquiryResponseModel> EnquiryById(int id)
@@ -59,6 +59,9 @@ namespace School.API.Core.Services
             res.dob = enquiry.enquiry.dob;
             res.className = enquiry.enquiry.className;
             res.guardian = enquiry.enquiry.guardian;
+            res.parentInteraction = enquiry.enquiry.parentInteraction;
+            res.rating = enquiry.enquiry.rating;
+            res.review = enquiry.enquiry.review;
             _applicationDbContext.SaveChanges();
             var examDetails = _applicationDbContext.EnquiryEntranceExams.Where(x => x.enquiryStudentId == enquiry.enquiryEntranceExam.enquiryStudentId).SingleOrDefault();
             examDetails.dateOfExam = enquiry.enquiryEntranceExam.dateOfExam;
