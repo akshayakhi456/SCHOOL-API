@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace School.API.Core.Entities
 {
     public class Payments
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int invoiceId { get; set; }
         [Required]
         public string paymentName { get; set; }
@@ -18,5 +20,10 @@ namespace School.API.Core.Entities
         public DateTime dateOfPayment { get; set; }
         [Required]
         public int studentId { get; set; }
+        [Required]
+        public int PaymentAllotmentId { get; set; }
+        [Required]
+        public int acedamicYearId { get; set; }
+        public DateTime dueDateOfPayment { get; set; }
     }
 }

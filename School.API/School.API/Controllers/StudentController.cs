@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using School.API.Core.Interfaces;
 using School.API.Core.Models.StudentRequestModel;
@@ -8,6 +9,7 @@ namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class StudentController : Controller
     {
         private readonly IStudent _studentService;

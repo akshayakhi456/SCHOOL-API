@@ -168,7 +168,7 @@ namespace School.API.Core.Services
                     IsSucceed = true,
                     Message = "Roles Seeding is Already Done"
                 };
-
+            
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.USER));
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.ADMIN));
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.OWNER));

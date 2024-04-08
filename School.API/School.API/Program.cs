@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
+using School.API.Core.Identity;
 using School.API.Core.Interfaces;
 using School.API.Core.Services;
 using System.Text;
@@ -57,7 +58,7 @@ builder.Services
         options.SaveToken = true;
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters()
-        {
+        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
@@ -66,7 +67,21 @@ builder.Services
         };
     });
 
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(IdentityData.AdminRolePolicyName, p =>
+    {
+        p.RequireRole(IdentityData.AdminRoleName, IdentityData.OwnerRoleName);
+    });
+    options.AddPolicy(IdentityData.UserRolePolicyName, p =>
+    {
+        p.RequireRole(IdentityData.AdminRoleName, IdentityData.UserRoleName);
+    });
+    options.AddPolicy(IdentityData.OwnerRolePolicyName, p =>
+    {
+        p.RequireRole(IdentityData.OwnerRoleName);
+    });
+});
 
 
 // Inject app Dependencies (Dependency Injection)
@@ -135,6 +150,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

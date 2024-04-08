@@ -1,12 +1,16 @@
 ﻿using School.API.Core.Entities;
+using School.API.Core.Models.PaymentRequestResponseModel;
 
 namespace School.API.Core.Interfaces
 {
     public interface IPayment
     {
-        List<Payments> list();
+        List<PaymentResponseModel> list();
 
-        List<Payments> listById(int id);
+        List<PaymentResponseModel> listById(int id);
         bool create(Payments payments);
+
+        List<ClassWisePaymentResponseModel> classWisePayment();
+        List<ClassWisePaymentResponseModel> yearWisePayment();
     }
 }

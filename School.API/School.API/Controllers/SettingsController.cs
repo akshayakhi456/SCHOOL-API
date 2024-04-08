@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
@@ -7,6 +8,7 @@ namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SettingsController : ControllerBase
     {
         private readonly ISettings _settings;

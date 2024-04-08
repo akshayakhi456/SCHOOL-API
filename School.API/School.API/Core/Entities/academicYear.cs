@@ -3,19 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace School.API.Core.Entities
 {
-    public class PaymentAllotment
+    public class academicYear
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
-        public string paymentName { get; set; }
-        [Required]
-        public string amount { get; set; }
-        [Required]
-        public string className { get; set; }
-        [Required]
-        public int acedamicYearId { get; set; }
-
+        public string academicYears { get; set; }
     }
 }

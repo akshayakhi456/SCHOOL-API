@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
@@ -7,6 +8,7 @@ namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ExpensesController : ControllerBase
     {
         private readonly IExpenses _expenses;
@@ -37,6 +39,21 @@ namespace School.API.Controllers
                 var res = _expenses.create(expenses);
                 return Ok(res);
             } catch(Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("graph")]
+        public IActionResult graph()
+        {
+            try
+            {
+                var res = _expenses.expensesGraph();
+                return Ok(res);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex);
             }

@@ -1,6 +1,8 @@
 ﻿using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.EnquiryRequestResponseModel;
+using System.Linq;
 
 namespace School.API.Core.Services
 {
@@ -21,6 +23,16 @@ namespace School.API.Core.Services
             _applicationDbContext.Expenses.Add(expenses);
             _applicationDbContext.SaveChanges();
             return true;
+        }
+
+        public List<ExpenseGraphResponse> expensesGraph()
+        {
+            var record = _applicationDbContext.Expenses.GroupBy(d => d.doe.Month).ToList();
+            return record.Select(c => new ExpenseGraphResponse
+            {
+                count = (int)c.Sum(x => x.amount),
+                month = c.FirstOrDefault().doe.Month
+            }).OrderBy(x=>x.month).ToList();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using School.API.Core.Entities;
+using School.API.Core.Models.EnquiryRequestResponseModel;
 
 namespace School.API.Core.Interfaces
 {
@@ -6,6 +7,7 @@ namespace School.API.Core.Interfaces
     {
         List<Expenses> list();
         bool create(Expenses expenses);
+        List<ExpenseGraphResponse> expensesGraph();
 
     }
 }
