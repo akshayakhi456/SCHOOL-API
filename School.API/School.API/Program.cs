@@ -7,6 +7,7 @@ using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Identity;
 using School.API.Core.Interfaces;
+using School.API.Core.Middleware;
 using School.API.Core.Services;
 using System.Text;
 
@@ -91,6 +92,9 @@ builder.Services.AddScoped<IEnquiry, EnquiryService>();
 builder.Services.AddScoped<IExpenses, ExpensesService>();
 builder.Services.AddScoped<IPayment, PaymentService>();
 builder.Services.AddScoped<ISettings, SettingsService>();
+builder.Services.AddScoped<IDashboard, DashboardService>();
+builder.Services.AddScoped<IInvoice, InvoiceService>();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -158,5 +162,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseStaticFiles();
+
+app.UseMiddleware<JWTMiddleware>();
 
 app.Run();

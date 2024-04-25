@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.PaymentRequestResponseModel;
+using School.API.Core.Models.Wrappers;
+using System.Net;
 
 namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class PaymentsController : ControllerBase
     {
         private readonly IPayment _payment;
@@ -61,12 +64,12 @@ namespace School.API.Controllers
         }
 
         [HttpGet]
-        [Route("classWiseReport")]
-        public IActionResult GetClassWiseReport()
+        [Route("classWiseReport/{yearId}")]
+        public IActionResult GetClassWiseReport(int yearId)
         {
             try
             {
-                var res = _payment.classWisePayment();
+                var res = _payment.classWisePayment(yearId);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -76,17 +79,31 @@ namespace School.API.Controllers
         }
 
         [HttpGet]
-        [Route("yearWiseReport")]
-        public IActionResult GetYearWiseReport()
+        [Route("yearWiseReport/{yearId}")]
+        public IActionResult GetYearWiseReport(int yearId)
         {
             try
             {
-                var res = _payment.yearWisePayment();
+                var res = _payment.yearWisePayment(yearId);
                 return Ok(res);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("studentsRecordOfPayment")]
+        public IActionResult GetMonthWiseReport(PaymentOfClassWiseStudentsRequestModel requestModel)
+        {
+            try
+            {
+                var result = _payment.GetStudentPaymentDataByClassOrSection(requestModel);
+                return Ok(result);
+            }catch(Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "Something went wrong", ex.Message));
             }
         }
     }

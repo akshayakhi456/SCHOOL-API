@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using School.API.Core.DbContext;
 
@@ -11,9 +12,11 @@ using School.API.Core.DbContext;
 namespace School.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240417133428_InvoiceTbl")]
+    partial class InvoiceTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -440,12 +443,6 @@ namespace School.API.Migrations
 
             modelBuilder.Entity("School.API.Core.Entities.InvoiceGenerate", b =>
                 {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
                     b.Property<int>("invoiceId")
                         .HasColumnType("int");
 
@@ -455,8 +452,6 @@ namespace School.API.Migrations
 
                     b.Property<int>("studentId")
                         .HasColumnType("int");
-
-                    b.HasKey("id");
 
                     b.ToTable("InvoiceGenerates");
                 });

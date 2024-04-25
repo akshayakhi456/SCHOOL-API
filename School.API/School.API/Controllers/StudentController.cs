@@ -2,14 +2,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using School.API.Core.Interfaces;
+using School.API.Core.Middleware;
 using School.API.Core.Models.StudentRequestModel;
+using School.API.Core.Models.Wrappers;
+using System.Net;
 
 
 namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [CustomAuthorize]
     public class StudentController : Controller
     {
         private readonly IStudent _studentService;
@@ -27,7 +30,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -42,7 +45,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -61,10 +64,10 @@ namespace School.API.Controllers
                     var res = await _studentService.create(oStudentGuardian);
                     return Ok(res);
                 }
-                return BadRequest("failed");
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "failed"));
             }
             catch (Exception ex) {
-                return StatusCode(500,ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -83,11 +86,11 @@ namespace School.API.Controllers
                     var res = await _studentService.update(oStudentGuardian);
                     return Ok(res);
                 }
-                return BadRequest("failed");
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "failed"));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
     }

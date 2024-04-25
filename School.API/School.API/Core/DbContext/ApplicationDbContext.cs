@@ -31,5 +31,7 @@ namespace School.API.Core.DbContext
 
         public virtual DbSet<PaymentAllotment> paymentAllotments { get; set; }
 
+        public virtual DbSet<InvoiceGenerate> InvoiceGenerates { get; set; }
+
     }
 }

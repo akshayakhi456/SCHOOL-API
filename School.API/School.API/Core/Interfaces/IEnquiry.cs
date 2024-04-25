@@ -5,11 +5,11 @@ namespace School.API.Core.Interfaces
 {
     public interface IEnquiry
     {
-        Task<EnquiryResponseModel> EnquiryById(int id);
-        Task<List<Enquiry>> list();
-        Task<Enquiry> create(CreateEnquiryRequestModel enquiry);
-        Task<bool> update(CreateEnquiryRequestModel enquiry);
-        Task<bool> entranceExamFee(PaymentsEnquiry paymentsEnquiry);
+        EnquiryResponseModel EnquiryById(int id);
+        List<Enquiry> list();
+        Enquiry create(CreateEnquiryRequestModel enquiry);
+        string update(CreateEnquiryRequestModel enquiry);
+        string entranceExamFee(PaymentsEnquiry paymentsEnquiry);
         string updateStatusEnquiryStudent(int id, bool status);
     }
 }

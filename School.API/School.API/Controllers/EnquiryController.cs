@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
 using School.API.Core.Models.EnquiryRequestResponseModel;
+using School.API.Core.Models.Wrappers;
+using System.Net;
 
 namespace School.API.Controllers
 {
@@ -22,10 +24,10 @@ namespace School.API.Controllers
             try
             {
                 var res = _enquiry.list();
-                return Ok(res);
+                return StatusCode(200, new APIResponse<List<Enquiry>>((int)HttpStatusCode.Accepted, "Enqiry List", res));
             }
-            catch (Exception ex) { 
-                return StatusCode(500, ex);
+            catch (Exception ex) {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -36,11 +38,11 @@ namespace School.API.Controllers
             try
             {
                 var res = _enquiry.EnquiryById(id);
-                return Ok(res);
+                return StatusCode(200, new APIResponse<EnquiryResponseModel>((int)HttpStatusCode.Accepted, "Enqiry List by Id", res));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -50,9 +52,10 @@ namespace School.API.Controllers
             try
             {
                 var res = _enquiry.create(enquiry);
-                return Ok(res);
-            } catch (Exception ex) {
-                return StatusCode(500, ex);
+                return StatusCode(200, new APIResponse<Enquiry>((int)HttpStatusCode.Accepted, "Enqiry Created Successfully", res));
+            }
+            catch (Exception ex) {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -63,11 +66,11 @@ namespace School.API.Controllers
             try
             {
                 var res = _enquiry.update(enquiry);
-                return StatusCode(200, res);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.Accepted, res));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -78,10 +81,11 @@ namespace School.API.Controllers
             try
             {
                 var res = _enquiry.entranceExamFee(paymentsEnquiry);
-                return Ok(res);
-            }catch(Exception ex)
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.Accepted, res));
+            }
+            catch(Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -92,11 +96,11 @@ namespace School.API.Controllers
             try
             {
                 var res = _enquiry.updateStatusEnquiryStudent(id,status);
-                return Ok(res);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.Accepted, res));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
     }

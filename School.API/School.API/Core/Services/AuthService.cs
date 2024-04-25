@@ -24,7 +24,7 @@ namespace School.API.Core.Services
         }
 
 
-        public async Task<AuthServiceResponseDto> LoginAsync(LoginDto loginDto)
+        public async Task<AuthServiceResponseDto> LoginAsync(LoginDto loginDto, string ipAddress)
         {
             var user = await _userManager.FindByNameAsync(loginDto.UserName);
 
@@ -53,6 +53,7 @@ namespace School.API.Core.Services
                 new Claim("JWTID", Guid.NewGuid().ToString()),
                 new Claim("FirstName", user.FirstName),
                 new Claim("LastName", user.LastName),
+                new Claim("IPAddress", ipAddress)
             };
 
             foreach (var userRole in userRoles)
@@ -195,6 +196,38 @@ namespace School.API.Core.Services
             string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
 
             return token;
+        }
+
+        public string? ValidateJwtToken(string? token)
+        {
+            if (token == null)
+                return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var ipAddress = jwtToken.Claims.First(x => x.Type == "IPAddress").Value;
+
+                // return ipAddress from JWT token if validation successful
+                return ipAddress;
+            }
+            catch
+            {
+                // return null if validation fails
+                return null;
+            }
         }
     }
 }

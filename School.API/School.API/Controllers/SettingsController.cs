@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using School.API.Common;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.Wrappers;
+using System.Net;
 
 namespace School.API.Controllers
 {
@@ -42,7 +45,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -55,9 +58,13 @@ namespace School.API.Controllers
                 var res = _settings.createClass(classes);
                 return CreatedAtAction(nameof(GetClass), new { message = res });
             }
+            catch (EntityInvalidException ex)
+            {
+                return StatusCode(400, new APIResponse<string>((int)HttpStatusCode.BadRequest, ex.Message));
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -72,7 +79,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -87,7 +94,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -101,7 +108,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -116,7 +123,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -131,7 +138,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -146,7 +153,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -161,7 +168,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -176,7 +183,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -191,7 +198,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -206,7 +213,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -221,7 +228,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -236,7 +243,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -251,7 +258,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 
@@ -266,7 +273,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
     }

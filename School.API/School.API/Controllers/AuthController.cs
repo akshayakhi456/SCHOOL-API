@@ -45,7 +45,8 @@ namespace School.API.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var loginResult = await _authService.LoginAsync(loginDto);
+            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            var loginResult = await _authService.LoginAsync(loginDto, ipAddress);
 
             if (loginResult.IsSucceed)
                 return Ok(loginResult);

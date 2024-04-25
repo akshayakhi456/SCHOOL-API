@@ -1,7 +1,7 @@
-﻿using School.API.Core.DbContext;
+﻿using School.API.Common;
+using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
-using static System.Collections.Specialized.BitVector32;
 using Section = School.API.Core.Entities.Section;
 
 namespace School.API.Core.Services
@@ -19,7 +19,7 @@ namespace School.API.Core.Services
                 var isExistClass = _applicationDbContext.classes.Any(c => c.className == classes.className);
                 if (isExistClass)
                 {
-                    return "Already Class Exist";
+                    throw new EntityInvalidException("NotValid", "Already Class Exist");
                 }
                _applicationDbContext.classes.Add(classes);
                _applicationDbContext.SaveChanges();
@@ -59,13 +59,13 @@ namespace School.API.Core.Services
             {
                 var isExistSection = _applicationDbContext.section.Any(x => x.section == section.section && x.className == section.className);
                 if (isExistSection) {
-                    return "Already Section Exist";
+                    throw new EntityInvalidException("section","Already Section Exist");
                 }
                 _applicationDbContext.section.Add(section);
                 _applicationDbContext.SaveChanges();
                 return "Created Successully";
             }
-            return "Something went wrong";
+            throw new EntityInvalidException("Something went wrong");
         }
 
         public List<Section> getSections()
@@ -131,7 +131,7 @@ namespace School.API.Core.Services
             var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.className == paymentAllotment.className);
             if (isExistPayment)
             {
-                return "Already Payment Name Exist";
+                throw new EntityInvalidException("Already Payment Name Exist");
             }
             _applicationDbContext.paymentAllotments.Add(paymentAllotment);
             _applicationDbContext.SaveChanges();
@@ -142,7 +142,7 @@ namespace School.API.Core.Services
             var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.className == paymentAllotment.className && x.id != paymentAllotment.id);
             if (isExistPayment)
             {
-                return "Already Payment Name Exist";
+                throw new EntityInvalidException("Already Payment Name Exist");
             }
             _applicationDbContext.paymentAllotments.Update(paymentAllotment);
             _applicationDbContext.SaveChanges();

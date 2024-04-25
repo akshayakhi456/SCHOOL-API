@@ -19,11 +19,13 @@ namespace School.API.Core.Entities
         [Required]
         public DateTime dateOfPayment { get; set; }
         [Required]
+        [ForeignKey("Students")]
         public int studentId { get; set; }
         [Required]
+        [ForeignKey("PaymentAllotment")]
         public int PaymentAllotmentId { get; set; }
         [Required]
         public int acedamicYearId { get; set; }
-        public DateTime dueDateOfPayment { get; set; }
+        public DateTime? dueDateOfPayment { get; set; }
     }
 }

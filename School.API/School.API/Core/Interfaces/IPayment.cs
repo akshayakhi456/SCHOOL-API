@@ -10,7 +10,9 @@ namespace School.API.Core.Interfaces
         List<PaymentResponseModel> listById(int id);
         bool create(Payments payments);
 
-        List<ClassWisePaymentResponseModel> classWisePayment();
-        List<ClassWisePaymentResponseModel> yearWisePayment();
+        List<ClassWisePaymentResponseModel> classWisePayment(int yearId);
+        List<ClassWisePaymentResponseModel> yearWisePayment(int yearId);
+
+        IEnumerable<PaymentOfClassWiseStudentsResponseModel> GetStudentPaymentDataByClassOrSection(PaymentOfClassWiseStudentsRequestModel requestModel);
     }
 }

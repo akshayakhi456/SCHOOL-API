@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using School.API.Common;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
@@ -44,7 +45,14 @@ namespace School.API.Core.Services
                             .Where(x => x.studentId.Equals(id.ToString())).ToListAsync();
             var studentAddress = _applicationDbContext.StudentAddresses
                                     .Where(x => x.studentId.Equals(id)).SingleOrDefault();
-            studentRecord.photo = this.GetImage(Convert.ToBase64String(studentRecord.photo));
+            if (studentRecord is Students)
+            {
+                studentRecord.photo = this.GetImage(Convert.ToBase64String(studentRecord.photo));
+            }
+            else
+            {
+                throw new EntityInvalidException("Invalid", "Record not found");
+            }
             StudentGuardianRequest sgr = new StudentGuardianRequest()
             {
                 students = studentRecord,

@@ -15,7 +15,7 @@ namespace School.API.Core.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<Enquiry> create(CreateEnquiryRequestModel createEnquiryRequestModel)
+        public Enquiry create(CreateEnquiryRequestModel createEnquiryRequestModel)
         {
            _applicationDbContext.Enquiry.Add(createEnquiryRequestModel.enquiry);
             _applicationDbContext.SaveChanges();
@@ -25,29 +25,29 @@ namespace School.API.Core.Services
                 _applicationDbContext.EnquiryEntranceExams.Add(createEnquiryRequestModel.enquiryEntranceExam);
                 _applicationDbContext.SaveChanges();
             }
-            return Task.FromResult(createEnquiryRequestModel.enquiry);
+            return createEnquiryRequestModel.enquiry;
         }
 
-        public Task<EnquiryResponseModel> EnquiryById(int id)
+        public EnquiryResponseModel EnquiryById(int id)
         {
             var enquiryDetails = _applicationDbContext.Enquiry.Where(x => x.id == id).SingleOrDefault();
             var entranceDetails = _applicationDbContext.EnquiryEntranceExams.Where(x => x.enquiryStudentId == id.ToString()).SingleOrDefault();
             var paymentDetails = _applicationDbContext.paymentsEnquiry.Where(x => x.studentEnquireId == id).FirstOrDefault();
-            return Task.FromResult(new EnquiryResponseModel()
+            return new EnquiryResponseModel()
             {
                 enquiry = enquiryDetails,
                 enquiryEntranceExam = entranceDetails,
                 paymentsEnquiry = paymentDetails
-            });
+            };
         }
 
-        public Task<List<Enquiry>> list()
+        public List<Enquiry> list()
         {
             var res = _applicationDbContext.Enquiry.ToList();
-            return Task.FromResult(res);
+            return res;
         }
 
-        public Task<bool> update(CreateEnquiryRequestModel enquiry)
+        public string update(CreateEnquiryRequestModel enquiry)
         {
             var res = _applicationDbContext.Enquiry.Where(x=>x.id == enquiry.enquiry.id).SingleOrDefault();
             res.firstName = enquiry.enquiry.firstName;
@@ -68,10 +68,10 @@ namespace School.API.Core.Services
             examDetails.modeOfExam = enquiry.enquiryEntranceExam.modeOfExam;
             examDetails.scheduleTimeForExam = enquiry.enquiryEntranceExam.scheduleTimeForExam;
             _applicationDbContext.SaveChanges();
-            return Task.FromResult(true);
+            return "Updated successfully";
         }
         
-        public Task<bool> entranceExamFee(PaymentsEnquiry paymentsEnquiry)
+        public string entranceExamFee(PaymentsEnquiry paymentsEnquiry)
         {
             var isExist = _applicationDbContext.paymentsEnquiry.Any(x => x.studentEnquireId == paymentsEnquiry.studentEnquireId);
             if (isExist)
@@ -87,14 +87,14 @@ namespace School.API.Core.Services
             _applicationDbContext.paymentsEnquiry.Add(paymentsEnquiry);
             }
             _applicationDbContext.SaveChanges(); 
-            return Task.FromResult(true);
+            return "Payment Successfull";
         }
 
         public string updateStatusEnquiryStudent(int id, bool status)
         {
             var rec = _applicationDbContext.Enquiry.Where(x => x.id == id).FirstOrDefault();
             rec.status = status;
-            return "Updated Successfully";
+            return "Status updated Successfully";
         }
     }
 }

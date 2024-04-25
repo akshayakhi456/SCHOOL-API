@@ -26,5 +26,6 @@ namespace School.API.Core.Entities
         public long adharNumber { get; set; }
         public string?  sibilings { get; set; }
         public string? certificateNames { get;set; }
+        public DateTime dateOfJoining { get; set; } = new DateTime();
     }
 }
