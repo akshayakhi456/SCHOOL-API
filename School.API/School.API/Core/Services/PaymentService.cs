@@ -64,30 +64,52 @@ namespace School.API.Core.Services
         public List<ClassWisePaymentResponseModel> classWisePayment(int yearId)
         {
             var records = StudentPaymentRecords(yearId);
+            
+            var classWiseStudentCount = from std in _applicationDbContext.Students
+                                        group std by std.className into className
+                                        select new
+                                        {
+                                            className = className.First().className,
+                                            count = className.Count()
+                                        };
+            
+            var paymentAllotmentTotalClassWise = _applicationDbContext.paymentAllotments
+                            .Where(x => x.acedamicYearId == yearId)
+                            .GroupBy(paymentAllotment => paymentAllotment.className).ToList();
+            var totalAllotment = paymentAllotmentTotalClassWise.Select(className => new
+            {
+                ClassName = className.Key,
+                Total = className.Sum(x => int.Parse(x.amount)) * classWiseStudentCount.FirstOrDefault(x => x.className == className.Key).count// Parse amount to long
+            }).ToList();
             var result = (from record in records
                           group record by record.className into className
                           select new ClassWisePaymentResponseModel
                           {
-                              className = className.FirstOrDefault().className,
-                              actualAmount = className.Sum(c => long.Parse(c.paymentAllotmentAmount)),
+                              className = className.Key,
+                              actualAmount = totalAllotment.FirstOrDefault(x => x.ClassName == className.Key).Total,
                               receivedAmount = className.Sum(c => c.amount),
-                              pendingAmount = className.Sum(c => long.Parse(c.paymentAllotmentAmount)) - className.Sum(c => c.amount)
-                          }).ToList();
+                              pendingAmount = totalAllotment.FirstOrDefault(x => x.ClassName == className.Key).Total - className.Sum(c => c.amount)
+                          }).OrderBy(x => x.className).ToList();
             return result;
         }
 
         public List<ClassWisePaymentResponseModel> yearWisePayment(int yearId)
         {
-            var records = StudentPaymentRecords(yearId);
-            var result = (from record in records
-                          group record by record.academicYears into academicYear
-                          select new ClassWisePaymentResponseModel
-                          {
-                              actualAmount = academicYear.Sum(c => long.Parse(c.paymentAllotmentAmount)),
-                              receivedAmount = academicYear.Sum(c => c.amount),
-                              pendingAmount = academicYear.Sum(c => long.Parse(c.paymentAllotmentAmount)) - academicYear.Sum(c => c.amount)
-                          }).ToList();
-            return result;
+            var classWiseReport = classWisePayment(yearId);
+            List<ClassWisePaymentResponseModel> finalReport = new List<ClassWisePaymentResponseModel>();
+            finalReport.Add(new ClassWisePaymentResponseModel
+            {
+                actualAmount = 0,
+                pendingAmount = 0,
+                receivedAmount = 0
+            });
+            foreach (var item in classWiseReport)
+            {
+                finalReport[0].actualAmount += item.actualAmount;
+                finalReport[0].receivedAmount += item.receivedAmount;
+                finalReport[0].pendingAmount += item.pendingAmount;
+            }
+            return finalReport;
         }
 
         public List<PaymentResponseModel> StudentPaymentRecords(int yearId)
@@ -114,55 +136,39 @@ namespace School.API.Core.Services
 
         public IEnumerable<PaymentOfClassWiseStudentsResponseModel> GetStudentPaymentDataByClassOrSection(PaymentOfClassWiseStudentsRequestModel requestModel)
         {
-            var records = StudentPaymentRecordsByAllotment(requestModel);
-            var paymentOfStudents = (from record in records
-                                     group record by record.studentId into student
-                                     select new
-                                     {
-                                         studentId = student.Key,
-                                         actualAmount = student.First().paymentAllotmentAmount,
-                                         receivedAmount = student.Sum(c => c.amount),
-                                         pendingAmount = long.Parse(student.First().paymentAllotmentAmount) - student.Sum(c => c.amount)
-                                     }).ToList();
-            var students = (from student in _applicationDbContext.Students
-                            where student.className == requestModel.className && (student.section == requestModel.section || 1 == 1) select new { student }).ToList();
-
-            var studentPayments = from student in students 
-                                  join sPayment in paymentOfStudents on student.student.id equals sPayment.studentId
+            var studentRecords = (from student in _applicationDbContext.Students
+                                    where student.className == requestModel.className && (student.section == requestModel.section || student.section == null)
+                                    select student).ToList();
+            var studentIds = studentRecords.Select(x => x.id).ToList();
+            var paymentsRecords = from payment in _applicationDbContext.Payments
+                                  where payment.acedamicYearId == requestModel.academicYearId
+                                  && studentIds.Contains(payment.studentId)
+                                  && requestModel.PaymentAllotmentId.Contains(payment.PaymentAllotmentId)
+                                  select payment;
+            var sumOfStudentPayment = paymentsRecords.GroupBy(x => x.studentId)
+                                    .Select(y => new
+                                    {
+                                        studentId = y.Key,
+                                        receivedAmount = y.Sum(c => c.amount),
+                                    });
+            var paymentAllotments = (from paymentAllotment in _applicationDbContext.paymentAllotments
+                                    where requestModel.PaymentAllotmentId.Contains(paymentAllotment.id)
+                                    && paymentAllotment.className == requestModel.className
+                                    select paymentAllotment).ToList();
+            var totalAmount = paymentAllotments.Sum(c => long.Parse(c.amount));
+            var studentPayments = (from student in studentRecords
+                                  join sPayment in sumOfStudentPayment on student.id equals sPayment.studentId
                                   into joinedData
                                   from sPayment in joinedData.DefaultIfEmpty()
                                   select new PaymentOfClassWiseStudentsResponseModel
                                   {
-                                      studentId = student.student.id,
-                                      studentName = student.student.firstName + " " + student.student.lastName,
-                                      pendingAmount = sPayment != null ? sPayment.pendingAmount : 0,
-                                      actualAmount = sPayment != null ? long.Parse(sPayment.actualAmount) : 0,
-                                      receivedAmount = sPayment != null ?  sPayment.receivedAmount : 0
-                                  };
-
+                                      studentId = student.id,
+                                      studentName = student.firstName + " " + student.lastName,
+                                      pendingAmount = sPayment != null ? totalAmount - sPayment.receivedAmount : totalAmount,
+                                      actualAmount = totalAmount,
+                                      receivedAmount = sPayment != null ? sPayment.receivedAmount : 0
+                                  }).OrderBy(x => x.studentName).ToList();
             return studentPayments;
-        }
-
-        public List<PaymentResponseModel> StudentPaymentRecordsByAllotment(PaymentOfClassWiseStudentsRequestModel requestModel)
-        {
-            return (from payment in _applicationDbContext.Payments
-                    join paymentAllotment in _applicationDbContext.paymentAllotments on payment.PaymentAllotmentId equals paymentAllotment.id
-                    where payment.acedamicYearId == requestModel.academicYearId && requestModel.PaymentAllotmentId.Contains(payment.PaymentAllotmentId)
-                    select new PaymentResponseModel
-                    {
-                        invoiceId = payment.invoiceId,
-                        paymentName = payment.paymentName,
-                        studentId = payment.studentId,
-                        amount = payment.amount,
-                        dateOfPayment = payment.dateOfPayment,
-                        paymentAllotmentAmount = paymentAllotment.amount,
-                        remarks = payment.remarks,
-                        paymentType = payment.paymentType,
-                        paymentAllotmentId = paymentAllotment.id,
-                        className = paymentAllotment.className,
-                        academicYears = paymentAllotment.acedamicYearId
-                    }
-             ).ToList();
         }
     }
 }

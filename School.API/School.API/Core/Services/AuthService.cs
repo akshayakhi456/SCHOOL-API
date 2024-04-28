@@ -148,7 +148,7 @@ namespace School.API.Core.Services
             }
 
             // Add a Default USER Role to all users
-            await _userManager.AddToRoleAsync(newUser, StaticUserRoles.USER);
+            await _userManager.AddToRoleAsync(newUser, registerDto.Role);
 
             return new AuthServiceResponseDto()
             {

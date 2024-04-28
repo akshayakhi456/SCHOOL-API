@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PdfSharpCore;
-using PdfSharpCore.Pdf;
-using TheArtOfDev.HtmlRenderer.PdfSharp;
+//using PdfSharpCore;
+//using PdfSharpCore.Pdf;
+//using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace School.API.Controllers
 {
@@ -13,7 +13,7 @@ namespace School.API.Controllers
         //[Authorize(Policy = IdentityData.UserRolePolicyName)]
         public  async Task<IActionResult> GeneratePdf()
         {
-            var document = new PdfDocument();
+            //var document = new PdfDocument();
             //string htmlContent = "<div style='display: flex; gap: 20px;'>";
             string htmlContent = "<div>";
             htmlContent += "<div>Parent Copy</div>";
@@ -39,11 +39,11 @@ namespace School.API.Controllers
             htmlContent += "</table>";
             htmlContent += "</div>";
             //htmlContent += "<div>";
-            PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);
+            //PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);
             byte[]? response = null;
             using (MemoryStream ms = new MemoryStream())
             {
-                document.Save(ms);
+                //document.Save(ms);
                 response = ms.ToArray();
             }
             string FileName = "Invoice_1.pdf";

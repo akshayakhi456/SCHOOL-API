@@ -8,6 +8,7 @@ using School.API.Core.Entities;
 using School.API.Core.Identity;
 using School.API.Core.Interfaces;
 using School.API.Core.Middleware;
+using School.API.Core.Models.AuthUserRequestResponseModel;
 using School.API.Core.Services;
 using System.Text;
 
@@ -94,6 +95,7 @@ builder.Services.AddScoped<IPayment, PaymentService>();
 builder.Services.AddScoped<ISettings, SettingsService>();
 builder.Services.AddScoped<IDashboard, DashboardService>();
 builder.Services.AddScoped<IInvoice, InvoiceService>();
+builder.Services.AddTransient<IAuthUser, AuthUserService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -125,6 +127,9 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+//Email Config
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 //CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
