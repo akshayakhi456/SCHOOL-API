@@ -23,8 +23,8 @@ namespace School.API.Controllers
         public IActionResult List() {
             try
             {
-                var res = _enquiry.list();
-                return StatusCode(200, new APIResponse<List<Enquiry>>((int)HttpStatusCode.Accepted, "Enqiry List", res));
+                var res = _enquiry.List();
+                return StatusCode(200, new APIResponse<List<Enquiry>>((int)HttpStatusCode.OK, "Enqiry List", res));
             }
             catch (Exception ex) {
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
@@ -51,8 +51,8 @@ namespace School.API.Controllers
         public IActionResult Create(CreateEnquiryRequestModel enquiry) {
             try
             {
-                var res = _enquiry.create(enquiry);
-                return StatusCode(200, new APIResponse<Enquiry>((int)HttpStatusCode.Accepted, "Enqiry Created Successfully", res));
+                var res = _enquiry.Create(enquiry);
+                return StatusCode(200, new APIResponse<Enquiry>((int)HttpStatusCode.OK, "Enqiry Created Successfully", res));
             }
             catch (Exception ex) {
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
@@ -65,8 +65,8 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _enquiry.update(enquiry);
-                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.Accepted, res));
+                var res = _enquiry.Update(enquiry);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, res));
             }
             catch (Exception ex)
             {
@@ -80,8 +80,8 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _enquiry.entranceExamFee(paymentsEnquiry);
-                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.Accepted, res));
+                var res = _enquiry.EntranceExamFee(paymentsEnquiry);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, res));
             }
             catch(Exception ex)
             {
@@ -91,17 +91,48 @@ namespace School.API.Controllers
 
         [HttpPost]
         [Route("changeStatusEnquiryStudent/{id}")]
-        public IActionResult ChangeStatusEnquiryStudent(int id, bool status)
+        public IActionResult ChangeStatusEnquiryStudent(int id,[FromBody] bool status)
         {
             try
             {
-                var res = _enquiry.updateStatusEnquiryStudent(id,status);
-                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.Accepted, res));
+                var res = _enquiry.UpdateStatusEnquiryStudent(id,status);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, res));
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
+
+        [HttpPost]
+        [Route("SaveFeedBack")]
+        public IActionResult SaveFeedBack(StudentEnquiryFeedback feedback)
+        {
+            try
+            {
+                var res = _enquiry.SaveFeedback(feedback);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route("FeedbackList/{id}")]
+        public IActionResult FeedBackListById(int id)
+        {
+            try
+            {
+                var res = _enquiry.GetFeedback(id);
+                return StatusCode(200, new APIResponse<List<StudentEnquiryFeedback>>((int)HttpStatusCode.OK, "Enqiry of Student Feedback List", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
     }
 }

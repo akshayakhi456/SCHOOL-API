@@ -33,5 +33,7 @@ namespace School.API.Core.DbContext
 
         public virtual DbSet<InvoiceGenerate> InvoiceGenerates { get; set; }
 
+        public virtual DbSet<StudentEnquiryFeedback> StudentEnquiryFeedback { get; set; }
+
     }
 }

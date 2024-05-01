@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using School.API.Common;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
@@ -15,7 +16,7 @@ namespace School.API.Core.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public Enquiry create(CreateEnquiryRequestModel createEnquiryRequestModel)
+        public Enquiry Create(CreateEnquiryRequestModel createEnquiryRequestModel)
         {
            _applicationDbContext.Enquiry.Add(createEnquiryRequestModel.enquiry);
             _applicationDbContext.SaveChanges();
@@ -41,13 +42,13 @@ namespace School.API.Core.Services
             };
         }
 
-        public List<Enquiry> list()
+        public List<Enquiry> List()
         {
             var res = _applicationDbContext.Enquiry.ToList();
             return res;
         }
 
-        public string update(CreateEnquiryRequestModel enquiry)
+        public string Update(CreateEnquiryRequestModel enquiry)
         {
             var res = _applicationDbContext.Enquiry.Where(x=>x.id == enquiry.enquiry.id).SingleOrDefault();
             res.firstName = enquiry.enquiry.firstName;
@@ -71,7 +72,7 @@ namespace School.API.Core.Services
             return "Updated successfully";
         }
         
-        public string entranceExamFee(PaymentsEnquiry paymentsEnquiry)
+        public string EntranceExamFee(PaymentsEnquiry paymentsEnquiry)
         {
             var isExist = _applicationDbContext.paymentsEnquiry.Any(x => x.studentEnquireId == paymentsEnquiry.studentEnquireId);
             if (isExist)
@@ -90,11 +91,30 @@ namespace School.API.Core.Services
             return "Payment Successfull";
         }
 
-        public string updateStatusEnquiryStudent(int id, bool status)
+        public string UpdateStatusEnquiryStudent(int id, bool status)
         {
             var rec = _applicationDbContext.Enquiry.Where(x => x.id == id).FirstOrDefault();
+            if (rec is not Enquiry)
+            {
+                throw new EntityInvalidException("Failure", "User not Exist");
+            }
             rec.status = status;
+            _applicationDbContext.SaveChanges();
             return "Status updated Successfully";
+        }
+
+        public List<StudentEnquiryFeedback> GetFeedback(int id)
+        {
+            var records = _applicationDbContext.StudentEnquiryFeedback.Where(x => x.EnquiryId.Equals(id)).ToList();
+            
+            return records;
+        }
+
+        public string SaveFeedback(StudentEnquiryFeedback feedback)
+        {
+            _applicationDbContext.StudentEnquiryFeedback.Add(feedback);
+            _applicationDbContext.SaveChanges();
+            return "Feedback data saved successfully";
         }
     }
 }

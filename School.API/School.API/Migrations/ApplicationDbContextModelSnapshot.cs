@@ -628,6 +628,33 @@ namespace School.API.Migrations
                     b.ToTable("StudentAddresses");
                 });
 
+            modelBuilder.Entity("School.API.Core.Entities.StudentEnquiryFeedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EnquiryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentEnquiryFeedback");
+                });
+
             modelBuilder.Entity("School.API.Core.Entities.Students", b =>
                 {
                     b.Property<int>("id")

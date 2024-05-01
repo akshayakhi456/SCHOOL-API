@@ -12,8 +12,8 @@ using School.API.Core.DbContext;
 namespace School.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240426162032_removePaymentTblFK")]
-    partial class removePaymentTblFK
+    [Migration("20240430193848_StdEnquiryFeedbackTbl")]
+    partial class StdEnquiryFeedbackTbl
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -629,6 +629,33 @@ namespace School.API.Migrations
                     b.HasKey("id");
 
                     b.ToTable("StudentAddresses");
+                });
+
+            modelBuilder.Entity("School.API.Core.Entities.StudentEnquiryFeedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EnquiryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentEnquiryFeedback");
                 });
 
             modelBuilder.Entity("School.API.Core.Entities.Students", b =>
