@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using School.API.Core.Entities;
 using School.API.Common;
 using System.Text;
+using School.API.Core.OtherObjects;
 
 namespace School.API.Core.Services
 {
@@ -160,6 +161,28 @@ namespace School.API.Core.Services
             _applicationDbContext.SaveChanges();
            
             return "User updated Successfully";
+        }
+
+        public async Task<AuthServiceResponseDto> updateRole(UpdatePermissionDto updatePermissionDto)
+        {
+            var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+
+            if (user is null)
+                return new AuthServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    Message = "Invalid User name!!!!!!!!"
+                };
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = await _userManager.RemoveFromRolesAsync(user, roles);
+
+            var res = await _userManager.AddToRoleAsync(user, updatePermissionDto.role);
+
+            return new AuthServiceResponseDto()
+            {
+                IsSucceed = res.Succeeded,
+                Message = res.Succeeded ? "Role updated successfully" : res.Errors.ToList()[0].Description
+            };
         }
     }
 }

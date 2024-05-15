@@ -9,5 +9,7 @@ namespace School.API.Core.Interfaces
         Task<List<Students>> list();
         Task<bool> create(StudentGuardianRequest student);
         Task<bool> update(StudentGuardianRequest student);
+        List<StudentGuardianRequest> GetStudentsByRole(string role, string email);
+        List<StudentGuardianRequest> StudentsByClassName(string className);
     }
 }

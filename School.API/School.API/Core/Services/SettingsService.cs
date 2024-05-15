@@ -148,5 +148,42 @@ namespace School.API.Core.Services
             _applicationDbContext.SaveChanges();
             return "Updated Successfully";
         }
+
+        public List<Subject> subjectList()
+        {
+            return _applicationDbContext.Subjects.ToList();
+        }
+
+        public string createSubject(Subject subject)
+        {
+            var isSubjectExist = _applicationDbContext.Subjects.Any(x => x.SubjectName == subject.SubjectName);
+            if (isSubjectExist)
+            {
+                throw new EntityInvalidException("Subject Create", "Subject Already Exist");
+            }
+            _applicationDbContext.Subjects.Add(subject);
+            _applicationDbContext.SaveChanges();
+            return "Subject Added Successfully.";
+        }
+
+        public string updateSubject(Subject subject)
+        {
+            var record = _applicationDbContext.Subjects.FirstOrDefault(sub => sub.Id == subject.Id);
+            if (record == null)
+                throw new EntityInvalidException("Subject Update", "Subject not found");
+            record.SubjectName = subject.SubjectName;
+            _applicationDbContext.SaveChanges();
+            return "Subject Updated Successfully";
+        }
+
+        public string deleteSubject(int id)
+        {
+            var record = _applicationDbContext.Subjects.FirstOrDefault(sub => sub.Id == id);
+            if (record == null)
+                throw new EntityInvalidException("Subject Delete", "Subject not found");
+            _applicationDbContext.Subjects.Remove(record);
+            _applicationDbContext.SaveChanges();
+            return "Subject Updated Successfully";
+        }
     }
 }

@@ -22,5 +22,10 @@ namespace School.API.Core.Interfaces
         List<PaymentAllotment> GetPaymentAllotments(string className);
         string createPaymentAllotment(PaymentAllotment paymentAllotment);
         string updatePaymentAllotment(PaymentAllotment PaymentAllotment);
+
+        List<Subject> subjectList();
+        string createSubject(Subject subject);
+        string updateSubject(Subject subject);
+        string deleteSubject(int id);
     }
 }

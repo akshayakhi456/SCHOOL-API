@@ -1,17 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using School.API.Common;
 using School.API.Core.DbContext;
+using School.API.Core.Dtos;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.AuthUserRequestResponseModel;
 using School.API.Core.Models.StudentRequestModel;
+using School.API.Core.OtherObjects;
+using System.Text;
+using System;
+using School.API.Core.UtilityServices;
+using School.API.Core.UtilityServices.interfaces;
+using System.Linq;
 
 namespace School.API.Core.Services
 {
     public class StudentService : IStudent
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
-        public StudentService(ApplicationDbContext applicationDbContext) {
+        private readonly IAuthService _authService;
+        private readonly ISendMail _sendMail;
+        public StudentService(UserManager<ApplicationUser> userManager, IAuthService authService, ApplicationDbContext applicationDbContext, ISendMail sendMail) {
             _applicationDbContext = applicationDbContext;
+            _userManager = userManager;
+            _authService = authService;
+            _sendMail = sendMail;
         }
         public async Task<bool> create(StudentGuardianRequest student)
         {
@@ -21,13 +36,18 @@ namespace School.API.Core.Services
             if (student.guardians.Count() > 0)
             {
                 foreach (var item in student.guardians) { item.studentId = student.students.id.ToString(); }
-                _applicationDbContext.Guardians.AddRange(student.guardians);
+                await _applicationDbContext.Guardians.AddRangeAsync(student.guardians);
                 await _applicationDbContext.SaveChangesAsync();
             }
 
             student.address.studentId = student.students.id;
             _applicationDbContext.StudentAddresses.Add(student.address);
             await _applicationDbContext.SaveChangesAsync();
+                var fatherDetail = student.guardians.Find(x => x.relationship == "Father");
+                if (fatherDetail != null)
+                {
+                    createUserAccount(fatherDetail);
+                }
             return true;
         }
 
@@ -89,6 +109,89 @@ namespace School.API.Core.Services
                 bytes = Convert.FromBase64String(sBase64String);
             }
             return bytes;
+        }
+
+        public List<StudentGuardianRequest> StudentsByClassName(string className)
+        {
+            var students = _applicationDbContext.Students.Where(x => x.className == className).ToList();
+            var result = new List<StudentGuardianRequest>();
+            foreach (var item in students)
+            {
+                var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Father");
+                var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Mother");
+
+                result.Add(new StudentGuardianRequest()
+                {
+                    students = item,
+                    guardians = new List<Guardian>() { fatherDetail, motherDetail },
+                    address = null
+                });
+            }
+            return result;
+        }
+
+        public List<StudentGuardianRequest> GetStudentsByRole(string role, string email)
+        {
+            List<Students> students = new List<Students>();
+
+            var result = new List<StudentGuardianRequest>();
+            if (role == StaticUserRoles.ADMIN ||
+                role == StaticUserRoles.OWNER ||
+                role == StaticUserRoles.TEACHER)
+            {
+                students = _applicationDbContext.Students.ToList();
+            }
+            else if (role == StaticUserRoles.PARENT && !string.IsNullOrEmpty(email))
+            {
+                var studentIds = _applicationDbContext.Guardians
+                    .Where(x => x.email == email 
+                    && !string.IsNullOrEmpty(x.studentId)
+                    && !string.IsNullOrEmpty(x.email))
+                    .Select(x => int.Parse(x.studentId))
+                    .Distinct()
+                    .ToList();
+
+                students = _applicationDbContext.Students
+                    .Where(x => studentIds.Contains(x.id))
+                    .ToList();
+            }
+                foreach (var item in students)
+                {
+                    var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Father");
+                    var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Mother");
+                    var studentAddress = _applicationDbContext.StudentAddresses
+                                        .Where(x => x.studentId.Equals(item.id)).SingleOrDefault();
+                result.Add(new StudentGuardianRequest()
+                    {
+                        students = item,
+                        guardians = new List<Guardian>() { fatherDetail, motherDetail },
+                        address = studentAddress
+                    });
+                }
+            return result;
+        }
+
+        async void createUserAccount(Guardian fatherDetail)
+        {
+            var registerDTO = new RegisterDto();
+            registerDTO.FirstName = fatherDetail.FirstName;
+            registerDTO.LastName = fatherDetail.LastName;
+            registerDTO.Email = fatherDetail.email;
+            registerDTO.UserName = fatherDetail.FirstName + "" + fatherDetail.LastName.Substring(0, 3);
+            registerDTO.Password = "Password@123";
+            registerDTO.Role = StaticUserRoles.PARENT;
+
+            await _authService.RegisterAsync(registerDTO);
+
+            StringBuilder html = new StringBuilder();
+            html.Append($"<h4>Hello {fatherDetail.FirstName}</h4><br/>");
+            html.Append($"<p>Below are the credetials to login Skool UI App<p>");
+            html.Append($"<p>UserName: {registerDTO.UserName}</p><br/><p>Password: Password@123</p>");
+            MailRequest request = new MailRequest();
+            request.ToEmail = fatherDetail.email;
+            request.Subject = "Reset your Skool UI Password";
+            request.Body = html.ToString();
+            await _sendMail.SendEmailAsync(request);
         }
     }
 }

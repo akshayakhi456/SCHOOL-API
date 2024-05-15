@@ -27,5 +27,6 @@ namespace School.API.Core.Entities
         public string?  sibilings { get; set; }
         public string? certificateNames { get;set; }
         public DateTime dateOfJoining { get; set; } = new DateTime();
+        public string? CurrentClassName { get; set; }
     }
 }

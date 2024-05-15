@@ -18,5 +18,6 @@ namespace School.API.Core.Interfaces
 
         Task<IdentityResult> ChangePassword(ChangePasswordRequest changePasswordRequest, string userId);
         Task<MeResponse> UserDetail(string userId);
+        Task<AuthServiceResponseDto> updateRole(UpdatePermissionDto updatePermissionDto);
     }
 }

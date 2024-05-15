@@ -50,6 +50,7 @@ namespace School.API.Core.Services
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim("JWTID", Guid.NewGuid().ToString()),
                 new Claim("FirstName", user.FirstName),
                 new Claim("LastName", user.LastName),
@@ -161,19 +162,23 @@ namespace School.API.Core.Services
         {
             bool isOwnerRoleExists = await _roleManager.RoleExistsAsync(StaticUserRoles.OWNER);
             bool isAdminRoleExists = await _roleManager.RoleExistsAsync(StaticUserRoles.ADMIN);
-            bool isUserRoleExists = await _roleManager.RoleExistsAsync(StaticUserRoles.USER);
+            //bool isUserRoleExists = await _roleManager.RoleExistsAsync(StaticUserRoles.USER);
+            bool isUserTeacherExists = await _roleManager.RoleExistsAsync(StaticUserRoles.TEACHER);
+            bool isUserParentExists = await _roleManager.RoleExistsAsync(StaticUserRoles.PARENT);
 
-            if (isOwnerRoleExists && isAdminRoleExists && isUserRoleExists)
+            if (isOwnerRoleExists && isAdminRoleExists && isUserTeacherExists && isUserParentExists)
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = true,
                     Message = "Roles Seeding is Already Done"
                 };
-            
-            await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.USER));
+
+            //await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.USER));
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.ADMIN));
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.OWNER));
-          
+            await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.TEACHER));
+            await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.PARENT));
+
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,

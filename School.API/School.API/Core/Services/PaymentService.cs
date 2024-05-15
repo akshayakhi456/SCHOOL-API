@@ -80,16 +80,35 @@ namespace School.API.Core.Services
             {
                 ClassName = className.Key,
                 Total = className.Sum(x => int.Parse(x.amount)) * classWiseStudentCount.FirstOrDefault(x => x.className == className.Key).count// Parse amount to long
-            }).ToList();
-            var result = (from record in records
-                          group record by record.className into className
-                          select new ClassWisePaymentResponseModel
-                          {
-                              className = className.Key,
-                              actualAmount = totalAllotment.FirstOrDefault(x => x.ClassName == className.Key).Total,
-                              receivedAmount = className.Sum(c => c.amount),
-                              pendingAmount = totalAllotment.FirstOrDefault(x => x.ClassName == className.Key).Total - className.Sum(c => c.amount)
-                          }).OrderBy(x => x.className).ToList();
+            }).OrderBy(x => x.ClassName).ToList();
+            var classWiseSum = (from record in records
+                                group record by record.className into className
+                                select new
+                                {
+                                    className = className.Key,
+                                    receivedAmount = className.Sum(c => c.amount),
+                                });
+
+            var result = new List<ClassWisePaymentResponseModel>();
+            foreach (var record in totalAllotment)
+            {
+                ClassWisePaymentResponseModel model = new ClassWisePaymentResponseModel();
+                model.className = record.ClassName;
+                var classWiseSumItem = classWiseSum.FirstOrDefault(x => x.className == record.ClassName);
+                if (classWiseSumItem != null)
+                {
+                    model.receivedAmount = classWiseSumItem.receivedAmount;
+                    model.pendingAmount = record.Total - classWiseSumItem.receivedAmount;
+                }
+                else
+                {
+                    // Handle the case where no matching item is found in classWiseSum
+                    model.receivedAmount = 0; // or any default value you prefer
+                    model.pendingAmount = record.Total; // assuming pending amount is total amount if no record found
+                }
+                model.actualAmount = record.Total;
+                result.Add(model);
+            }
             return result;
         }
 
@@ -137,7 +156,7 @@ namespace School.API.Core.Services
         public IEnumerable<PaymentOfClassWiseStudentsResponseModel> GetStudentPaymentDataByClassOrSection(PaymentOfClassWiseStudentsRequestModel requestModel)
         {
             var studentRecords = (from student in _applicationDbContext.Students
-                                    where student.className == requestModel.className && (student.section == requestModel.section || student.section == null)
+                                    where student.className == requestModel.className && (student.section == requestModel.section || requestModel.section == null)
                                     select student).ToList();
             var studentIds = studentRecords.Select(x => x.id).ToList();
             var paymentsRecords = from payment in _applicationDbContext.Payments

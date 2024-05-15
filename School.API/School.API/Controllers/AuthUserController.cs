@@ -95,7 +95,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "Something went wrong", ex.Message));
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message, ex.Message));
             }
         }
 
@@ -110,7 +110,7 @@ namespace School.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "Something went wrong", ex.Message));
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message, ex.Message));
             }
         }
 
@@ -141,6 +141,22 @@ namespace School.API.Controllers
                 var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var result = _authUserService.UpdateUser(user, userId);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "User Detail List", result.Result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "Something went wrong", ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("updateRole")]
+        [CustomAuthorize]
+        public IActionResult UpdateUserRole(UpdatePermissionDto updatePermissionDto)
+        {
+            try
+            {
+                var result = _authUserService.updateRole(updatePermissionDto);
+                return StatusCode(200, new APIResponse<AuthServiceResponseDto>((int)HttpStatusCode.OK, "User Detail", result.Result));
             }
             catch (Exception ex)
             {

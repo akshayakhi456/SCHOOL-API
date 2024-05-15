@@ -35,5 +35,12 @@ namespace School.API.Core.DbContext
 
         public virtual DbSet<StudentEnquiryFeedback> StudentEnquiryFeedback { get; set; }
 
+        public virtual DbSet<ClassAssignSubjectTeacher> ClassAssignSubjectTeachers { get; set; }
+        public virtual DbSet<Subject> Subjects { get; set; }
+        public virtual DbSet<TeacherDetails> TeacherDetails { get; set;}
+        public virtual DbSet<TeacherExperience> TeacherExperiences { get; set; }
+        public virtual DbSet<StudentAttendance> StudentAttendances { get; set; }
+        public virtual DbSet<StudentClassSection> StudentClassSections { get; set; }
+
     }
 }

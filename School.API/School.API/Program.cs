@@ -10,6 +10,8 @@ using School.API.Core.Interfaces;
 using School.API.Core.Middleware;
 using School.API.Core.Models.AuthUserRequestResponseModel;
 using School.API.Core.Services;
+using School.API.Core.UtilityServices;
+using School.API.Core.UtilityServices.interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -95,7 +97,10 @@ builder.Services.AddScoped<IPayment, PaymentService>();
 builder.Services.AddScoped<ISettings, SettingsService>();
 builder.Services.AddScoped<IDashboard, DashboardService>();
 builder.Services.AddScoped<IInvoice, InvoiceService>();
-builder.Services.AddTransient<IAuthUser, AuthUserService>();
+builder.Services.AddScoped<ITeacher, TeacherService>();
+builder.Services.AddScoped<IStudentMapTeacher, StudentMapTeacherService>();
+builder.Services.AddScoped<IAuthUser, AuthUserService>();
+builder.Services.AddScoped<ISendMail, MailSend>();
 
 
 builder.Services.AddEndpointsApiExplorer();

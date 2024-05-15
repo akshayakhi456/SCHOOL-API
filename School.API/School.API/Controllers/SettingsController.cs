@@ -276,5 +276,65 @@ namespace School.API.Controllers
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
+
+        [HttpGet]
+        [Route("subjectList")]
+        public IActionResult SubjectList()
+        {
+            try
+            {
+                var res = _settings.subjectList();
+                return StatusCode(200, new APIResponse<List<Subject>>((int)HttpStatusCode.OK, "List Subject", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("subjectCreate")]
+        public IActionResult SubjectCreate(Subject subject)
+        {
+            try
+            {
+                var res = _settings.createSubject(subject);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Create Subject", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("subjectUpdate")]
+        public IActionResult SubjectUpdate(Subject subject)
+        {
+            try
+            {
+                var res = _settings.updateSubject(subject);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Update Subject", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpDelete]
+        [Route("subjectDelete/{id}")]
+        public IActionResult SubjectDeletet(int id)
+        {
+            try
+            {
+                var res = _settings.deleteSubject(id);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Delete Subject", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
     }
 }
