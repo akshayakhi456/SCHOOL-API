@@ -2,6 +2,7 @@
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
 using School.API.Core.Models.PaymentRequestResponseModel;
+using School.API.Migrations;
 
 namespace School.API.Core.Services
 {
@@ -12,10 +13,16 @@ namespace School.API.Core.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public bool create(Payments payment)
+        public bool create(AddPaymentRequest payment)
         {
-            _applicationDbContext.Payments.Add(payment);
+            _applicationDbContext.Payments.Add(payment.Payments);
             _applicationDbContext.SaveChanges();
+            if (payment.Payments.paymentType != "Cash")
+            {
+                payment.PaymentTransactionDetails.invoiceId = payment.Payments.invoiceId;
+                _applicationDbContext.PaymentTransactionDetails.Add(payment.PaymentTransactionDetails);
+                _applicationDbContext.SaveChanges(true);
+            }
             return true;
         }
 
@@ -23,6 +30,7 @@ namespace School.API.Core.Services
         {
             var res = (from payment in _applicationDbContext.Payments
                        join paymentAllotment in _applicationDbContext.paymentAllotments on payment.paymentName equals paymentAllotment.paymentName
+                       join paymentDetail in _applicationDbContext.PaymentTransactionDetails on payment.invoiceId equals paymentDetail.invoiceId
                        where payment.paymentName == paymentAllotment.paymentName
                        select new PaymentResponseModel
                        {
@@ -34,7 +42,8 @@ namespace School.API.Core.Services
                            paymentAllotmentAmount = paymentAllotment.amount,
                            remarks = payment.remarks,
                            paymentType = payment.paymentType,
-                           paymentAllotmentId = paymentAllotment.id
+                           paymentAllotmentId = paymentAllotment.id,
+                           transactionDetail = paymentDetail
                        }
                        ).ToList();
             return res;
@@ -44,6 +53,7 @@ namespace School.API.Core.Services
         {
             var res = (from payment in _applicationDbContext.Payments
                        join paymentAllotment in _applicationDbContext.paymentAllotments on payment.PaymentAllotmentId equals paymentAllotment.id
+                       join paymentDetail in _applicationDbContext.PaymentTransactionDetails on payment.invoiceId equals paymentDetail.invoiceId
                        where payment.studentId == id && payment.acedamicYearId == 1
                        select new PaymentResponseModel
                        {
@@ -55,7 +65,8 @@ namespace School.API.Core.Services
                            paymentAllotmentAmount = paymentAllotment.amount,
                            remarks = payment.remarks,
                            paymentType = payment.paymentType,
-                           paymentAllotmentId = paymentAllotment.id
+                           paymentAllotmentId = paymentAllotment.id,
+                           transactionDetail = paymentDetail
                        }
                        ).ToList();
             return res;

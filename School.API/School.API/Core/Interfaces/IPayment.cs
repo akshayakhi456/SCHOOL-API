@@ -8,7 +8,7 @@ namespace School.API.Core.Interfaces
         List<PaymentResponseModel> list();
 
         List<PaymentResponseModel> listById(int id);
-        bool create(Payments payments);
+        bool create(AddPaymentRequest payments);
 
         List<ClassWisePaymentResponseModel> classWisePayment(int yearId);
         List<ClassWisePaymentResponseModel> yearWisePayment(int yearId);

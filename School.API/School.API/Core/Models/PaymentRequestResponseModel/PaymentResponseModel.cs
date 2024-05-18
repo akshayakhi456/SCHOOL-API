@@ -16,5 +16,6 @@ namespace School.API.Core.Models.PaymentRequestResponseModel
         public string paymentAllotmentAmount { get; set; }
         public string className { get; set; }
         public int academicYears { get; set; }
+        public PaymentTransactionDetail? transactionDetail { get; set; }
     }
 }

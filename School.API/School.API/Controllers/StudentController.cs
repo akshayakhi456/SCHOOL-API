@@ -51,6 +51,21 @@ namespace School.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("studentByKey")]
+        public async Task<IActionResult> GetByKey([FromQuery] string q)
+        {
+            try
+            {
+                var res = await _studentService.StudentBykey(q);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
         [HttpPost]
         [Route("create")]
         public async Task<IActionResult> create([FromForm] IFormCollection fileObj)

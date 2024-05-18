@@ -55,7 +55,10 @@ namespace School.API.Core.Services
         public List<StudentAttendance> getStudentAttendance(AttendanceRequestModel attendanceRequestModel)
         {
 
-            var student = _applicationDbContext.StudentAttendances.Where(x => x.Month == attendanceRequestModel.Month && x.Year == attendanceRequestModel.Year).ToList();
+            var student = _applicationDbContext.StudentAttendances.Where(x => x.Month == attendanceRequestModel.Month 
+            && x.Year == attendanceRequestModel.Year
+            && x.ClassName == attendanceRequestModel.ClassName
+            && (x.Section == attendanceRequestModel.Section || String.IsNullOrEmpty(attendanceRequestModel.Section))).ToList();
                 
             return student;
         }
@@ -104,10 +107,10 @@ namespace School.API.Core.Services
 
             // Filter records based on the specified month and year range
             var student = allStudentAttendance
-                .Where(x =>
-                    (int.Parse(x.Month) >= startMonth && x.Year == attendanceRequestModel.StartYear) ||
-                    (int.Parse(x.Month) <= endMonth && x.Year == attendanceRequestModel.EndYear))
-                .ToList();
+                        .Where(x =>
+                            ((int.Parse(x.Month) >= startMonth && int.Parse(x.Month) <= endMonth) && x.Year == attendanceRequestModel.StartYear) ||
+                            (int.Parse(x.Month) == startMonth && x.Year == attendanceRequestModel.StartYear))
+                        .ToList();
 
             return student;
         }

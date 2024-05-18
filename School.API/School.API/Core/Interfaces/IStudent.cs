@@ -6,6 +6,7 @@ namespace School.API.Core.Interfaces
     public interface IStudent
     {
         Task<StudentGuardianRequest> StudentById(int id);
+        Task<List<StudentGuardianRequest>> StudentBykey(string key);
         Task<List<Students>> list();
         Task<bool> create(StudentGuardianRequest student);
         Task<bool> update(StudentGuardianRequest student);

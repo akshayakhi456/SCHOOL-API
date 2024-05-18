@@ -50,7 +50,7 @@ namespace School.API.Controllers
 
         [HttpPost]
         [Route("create")]
-        public IActionResult Create(Payments payments)
+        public IActionResult Create(AddPaymentRequest payments)
         {
             try
             {

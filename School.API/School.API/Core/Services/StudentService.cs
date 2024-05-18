@@ -82,6 +82,54 @@ namespace School.API.Core.Services
             return sgr;
         }
 
+        public async Task<List<StudentGuardianRequest>> StudentBykey(string key)
+        {
+            List<StudentGuardianRequest> students = new List<StudentGuardianRequest>();
+            var studentRecord = new List<Students>();
+            if (Int32.TryParse(key, out int parsedId))
+            {
+                studentRecord = _applicationDbContext.Students
+                    .Where(x => x.id == parsedId)
+                    .ToList();
+            }
+            else
+            {
+                studentRecord = _applicationDbContext.Students
+                    .Where(x =>
+                        EF.Functions.Like(x.firstName, $"{key}%") ||
+                        EF.Functions.Like(x.lastName, $"{key}%"))
+                    .ToList();
+            }
+
+
+            if (studentRecord.Count() > 0)
+            {
+                foreach (var item in studentRecord)
+                {
+                    var guardianRecords = await _applicationDbContext.Guardians
+                                    .Where(x => x.studentId.Equals(item.id.ToString())).ToListAsync();
+                    var studentAddress = _applicationDbContext.StudentAddresses
+                                            .Where(x => x.studentId.Equals(item.id)).SingleOrDefault();
+                    if (item is Students)
+                    {
+                        item.photo = this.GetImage(Convert.ToBase64String(item.photo));
+                    }
+                    else
+                    {
+                        throw new EntityInvalidException("Invalid", "Record not found");
+                    }
+                    StudentGuardianRequest sgr = new StudentGuardianRequest()
+                    {
+                        students = item,
+                        guardians = guardianRecords,
+                        address = studentAddress
+                    };
+                    students.Add(sgr);
+                }
+            }
+            return students;
+        }        
+
         public async Task<bool> update(StudentGuardianRequest student)
         {
             //var stdRecord = _applicationDbContext.Students.FirstOrDefault(std => std.id == student.students.id);
