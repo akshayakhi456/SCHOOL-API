@@ -46,5 +46,20 @@ namespace School.API.Controllers
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "Subject Marks list", ex.Message));
             }
         }
+
+        [HttpGet]
+        [Route("getMarksByClass")]
+        public IActionResult GetMarksByID([FromQuery] string className, string section, int acedemicYearId)
+        {
+            try
+            {
+                var res = _subject.getMarksByClass(className, section, acedemicYearId);
+                return StatusCode(200, new APIResponse<List<StudentMarks>>((int)HttpStatusCode.OK, "Subject Marks list", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "Subject Marks list", ex.Message));
+            }
+        }
     }
 }

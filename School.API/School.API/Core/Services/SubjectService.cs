@@ -38,5 +38,15 @@ namespace School.API.Core.Services
             var res = _applicationDbContext.StudentMarks.Where(x => x.Sid == studentId && x.AcedamicYearId == acedemicYearId).ToList();
             return res;
         }
+
+        public List<StudentMarks> getMarksByClass(string className, string section, int acedemicYearId)
+        {
+            var studentIDs = _applicationDbContext.StudentClassSections.Where(x => x.ClassName ==  className 
+            && (x.Section == section || String.IsNullOrEmpty(section)) 
+            && x.AcademicYear == acedemicYearId)
+                .Select(s => s.RollNo).ToList();
+            var res = _applicationDbContext.StudentMarks.Where(x => studentIDs.Contains(x.rollNo) && x.AcedamicYearId == acedemicYearId).ToList();
+            return res;
+        }
     }
 }

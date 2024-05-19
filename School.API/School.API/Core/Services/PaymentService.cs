@@ -54,7 +54,7 @@ namespace School.API.Core.Services
             var res = (from payment in _applicationDbContext.Payments
                        join paymentAllotment in _applicationDbContext.paymentAllotments on payment.PaymentAllotmentId equals paymentAllotment.id
                        join paymentDetail in _applicationDbContext.PaymentTransactionDetails on payment.invoiceId equals paymentDetail.invoiceId
-                       where payment.studentId == id && payment.acedamicYearId == 1
+                       where payment.studentId == id
                        select new PaymentResponseModel
                        {
                            invoiceId = payment.invoiceId,
@@ -66,7 +66,8 @@ namespace School.API.Core.Services
                            remarks = payment.remarks,
                            paymentType = payment.paymentType,
                            paymentAllotmentId = paymentAllotment.id,
-                           transactionDetail = paymentDetail
+                           transactionDetail = paymentDetail,
+                           academicYears = payment.acedamicYearId
                        }
                        ).ToList();
             return res;

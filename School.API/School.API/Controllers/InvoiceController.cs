@@ -32,7 +32,7 @@ namespace School.API.Controllers
                     byte[] imgBytes = System.Convert.FromBase64String(img);
                     invoiceGenerate.invoicePhoto = imgBytes;
                     var res = _invoice.createInvoice(invoiceGenerate);
-                    return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK));
+                    return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Invoice Saved Successfully."));
                 }
                 return StatusCode(500, new APIResponse <string>((int)HttpStatusCode.InternalServerError, "failed"));
             }
