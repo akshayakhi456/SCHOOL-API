@@ -185,5 +185,35 @@ namespace School.API.Core.Services
             _applicationDbContext.SaveChanges();
             return "Subject Updated Successfully";
         }
+
+        public List<Exam> getExams()
+        {
+            var res = _applicationDbContext.Exams.ToList();
+            return res;
+        }
+
+        public string saveExam(Exam exam)
+        {
+            var examExist = _applicationDbContext.Exams.FirstOrDefault(exam => exam.ExamName.Equals(exam.ExamName));
+            if (examExist is Exam)
+            {
+                Results.Conflict("Exam name already exist.");
+            }
+            _applicationDbContext.Exams.Add(exam);
+            _applicationDbContext.SaveChanges();
+            return "Saved Successfully.";
+        }
+
+        public string updateExam(Exam exam)
+        {
+            var examExist = _applicationDbContext.Exams.FirstOrDefault(exam => exam.Id.Equals(exam.Id));
+            if (examExist is not Exam)
+            {
+                Results.Conflict("Exam name not found.");
+            }
+            examExist.ExamName = exam.ExamName;
+            _applicationDbContext.SaveChanges();
+            return "Saved Successfully.";
+        }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using School.API.Configure;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Identity;
@@ -15,7 +16,8 @@ using School.API.Core.UtilityServices.interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//AutoMapper
+builder.Services.AddAutoMapper(typeof(SchoolProfile));
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -101,6 +103,8 @@ builder.Services.AddScoped<ITeacher, TeacherService>();
 builder.Services.AddScoped<IStudentMapTeacher, StudentMapTeacherService>();
 builder.Services.AddScoped<IAuthUser, AuthUserService>();
 builder.Services.AddScoped<ISendMail, MailSend>();
+builder.Services.AddScoped<ISubject, SubjectService>();
+builder.Services.AddScoped<IExam, ExamService>();
 
 
 builder.Services.AddEndpointsApiExplorer();

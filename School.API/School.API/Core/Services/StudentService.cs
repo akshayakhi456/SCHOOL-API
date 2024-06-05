@@ -30,6 +30,14 @@ namespace School.API.Core.Services
         }
         public async Task<bool> create(StudentGuardianRequest student)
         {
+            var studentExist = _applicationDbContext.Students.FirstOrDefault(s =>
+            s.firstName.Equals(student.students.firstName)
+            && s.lastName.Equals(student.students.lastName));
+            if(studentExist is not null)
+            {
+                throw new EntityInvalidException("Student create", "Already student Exist");
+            }
+
             var res = _applicationDbContext.Students.Add(student.students);
             await _applicationDbContext.SaveChangesAsync();
 
@@ -234,7 +242,8 @@ namespace School.API.Core.Services
             StringBuilder html = new StringBuilder();
             html.Append($"<h4>Hello {fatherDetail.FirstName}</h4><br/>");
             html.Append($"<p>Below are the credetials to login Skool UI App<p>");
-            html.Append($"<p>UserName: {registerDTO.UserName}</p><br/><p>Password: Password@123</p>");
+            html.Append($"<p>UserName: {registerDTO.UserName}</p>");
+            html.Append($"<p>Password: Password@123</p>");
             MailRequest request = new MailRequest();
             request.ToEmail = fatherDetail.email;
             request.Subject = "Reset your Skool UI Password";

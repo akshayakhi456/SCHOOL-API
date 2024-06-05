@@ -86,7 +86,7 @@ namespace School.API.Core.Services
                                         };
             
             var paymentAllotmentTotalClassWise = _applicationDbContext.paymentAllotments
-                            .Where(x => x.acedamicYearId == yearId)
+                            .Where(x => x.acedamicYearId == yearId && classWiseStudentCount.Any(y => y.className == x.className))
                             .GroupBy(paymentAllotment => paymentAllotment.className).ToList();
             var totalAllotment = paymentAllotmentTotalClassWise.Select(className => new
             {

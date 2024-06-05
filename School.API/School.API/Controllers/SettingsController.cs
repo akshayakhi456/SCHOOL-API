@@ -223,7 +223,7 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _settings.updateStatusEnquiryQuestion(id,status);
+                var res = _settings.updateStatusEnquiryQuestion(id, status);
                 return CreatedAtAction(nameof(GetClass), new { message = res });
             }
             catch (Exception ex)
@@ -336,5 +336,52 @@ namespace School.API.Controllers
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
+
+        [HttpGet]
+        [Route("exams")]
+        public IActionResult GetExamNames()
+        {
+            try
+            {
+                var res = _settings.getExams();
+                return StatusCode(200, new APIResponse<List<Exam>>((int)HttpStatusCode.OK, "Get Exams", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("exams")]
+        public IActionResult SaveExamName(Exam exam)
+        {
+            try
+            {
+                var res = _settings.saveExam(exam);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Save Exams", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPut]
+        [Route("exams")]
+        public IActionResult UpdateExamName(Exam exam)
+        {
+            try
+            {
+                var res = _settings.updateExam(exam);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Update Exams", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+       
     }
 }

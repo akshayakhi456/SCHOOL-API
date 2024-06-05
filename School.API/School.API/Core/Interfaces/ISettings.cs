@@ -27,5 +27,9 @@ namespace School.API.Core.Interfaces
         string createSubject(Subject subject);
         string updateSubject(Subject subject);
         string deleteSubject(int id);
+        List<Exam> getExams();
+        string saveExam(Exam exam);
+        string updateExam(Exam exam);
+       
     }
 }

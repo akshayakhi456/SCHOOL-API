@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
 using School.API.Core.Models.TeacherRequestResponseModel;
@@ -89,7 +87,7 @@ namespace School.API.Controllers
             }
         }
         [HttpDelete]
-        [Route("delete")]
+        [Route("delete/{id}")]
         public IActionResult Delete(int id)
         {
             try

@@ -21,7 +21,7 @@ namespace School.API.Core.Services
             {
                 foreach (var item in addTeacherRequest.TeacherExperience)
                 {
-                    item.EmpId = addTeacherRequest.TeacherDetails.id.ToString();
+                    item.EmpId = addTeacherRequest.TeacherDetails.Id.ToString();
                 }
                 _applicationDbContext.TeacherExperiences.AddRange(addTeacherRequest.TeacherExperience);
                 _applicationDbContext.SaveChanges();
@@ -36,7 +36,7 @@ namespace School.API.Core.Services
 
         public string employmentApproval(int id)
         {
-            var employee = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.id == id);
+            var employee = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.Id == id);
             var maxEmployeeId = _applicationDbContext.TeacherDetails.OrderByDescending(e => e.EmpId).FirstOrDefault();
             if (employee == null)
             {
@@ -53,7 +53,7 @@ namespace School.API.Core.Services
 
         public AddTeacherRequest getTeacherById(int id)
         {
-            var detail = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.id.Equals(id));
+            var detail = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.Id.Equals(id));
             var experience = _applicationDbContext.TeacherExperiences.Where(x => x.EmpId.Equals(id)).ToList();
             AddTeacherRequest teacher = new AddTeacherRequest();
             teacher.TeacherDetails = detail;
@@ -63,7 +63,7 @@ namespace School.API.Core.Services
 
         public string update(AddTeacherRequest updateTeacherRequest)
         {
-            var teacherDetail = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.id == updateTeacherRequest.TeacherDetails.id);
+            var teacherDetail = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.Id == updateTeacherRequest.TeacherDetails.Id);
             teacherDetail.FirstName = updateTeacherRequest.TeacherDetails.FirstName;
             teacherDetail.LastName = updateTeacherRequest.TeacherDetails.LastName;
             teacherDetail.DateOfBirth = updateTeacherRequest.TeacherDetails.DateOfBirth;
