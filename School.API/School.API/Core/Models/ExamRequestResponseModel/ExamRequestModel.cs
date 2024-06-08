@@ -1,6 +1,6 @@
-﻿namespace School.API.Core.Entities
+﻿namespace School.API.Core.Models.ExamRequestResponseModel
 {
-    public class ExamSubjectSchedule
+    public class ExamRequestModel
     {
         public int Id { get; set; }
         public int SubjectId { get; set; }
@@ -11,7 +11,6 @@
         public bool IsAddInTotal { get; set; }
         public bool WillExamConduct { get; set; }
         public DateTime ExamDate { get; set; }
-        public int AcademicYearId { get; set; }
-        public virtual Subject Subject { get; set; }
+        public int academicYearId { get; set; }
     }
 }

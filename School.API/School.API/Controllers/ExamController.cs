@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.ExamRequestResponseModel;
 using School.API.Core.Models.Wrappers;
 using System.Net;
 
@@ -12,15 +14,18 @@ namespace School.API.Controllers
     public class ExamController : ControllerBase
     {
         private readonly IExam _exam;
-        public ExamController(IExam exam) {
-        _exam = exam;
+        private readonly IMapper _mapper;
+        public ExamController(IExam exam, IMapper mapper) {
+            _exam = exam;
+            _mapper = mapper;
         }
         [HttpPost]
         [Route("addExamsDetails")]
-        public IActionResult AddExamDetails(List<ExamSubjectSchedule> examSubjectSchedules)
+        public IActionResult AddExamDetails(List<ExamRequestModel> examRequestModel)
         {
             try
             {
+                var examSubjectSchedules =_mapper.Map<List<ExamSubjectSchedule>>(examRequestModel);
                 var result = _exam.addExamSubjectSchedule(examSubjectSchedules);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Exam Subject add", result));
             }
@@ -32,10 +37,11 @@ namespace School.API.Controllers
 
         [HttpPut]
         [Route("updateExamsDetails")]
-        public IActionResult UpdateExamDetails(List<ExamSubjectSchedule> examSubjectSchedules)
+        public IActionResult UpdateExamDetails(List<ExamRequestModel> examRequestModel)
         {
             try
             {
+                var examSubjectSchedules = _mapper.Map<List<ExamSubjectSchedule>>(examRequestModel);
                 var result = _exam.upateExamSubjectSchedule(examSubjectSchedules);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Exam Subject update", result));
             }
@@ -52,7 +58,7 @@ namespace School.API.Controllers
             try
             {
                 var result = _exam.examSubjectSchedules(academicYearId, classId, examId);
-                return StatusCode(200, new APIResponse<List<ExamSubjectSchedule>>((int)HttpStatusCode.OK, "Exam Subject list", result));
+                return StatusCode(200, new APIResponse<List<ExamResponseModel>>((int)HttpStatusCode.OK, "Exam Subject list", result));
             }
             catch (Exception ex)
             {

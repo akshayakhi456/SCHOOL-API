@@ -45,14 +45,15 @@ namespace School.API.Core.Services
             return res;
         }
 
-        public List<StudentMarks> getMarksByClass(string className, string section, int acedemicYearId, string subject)
+        public List<StudentMarks> getMarksByClass(string className, string section, int acedemicYearId, int subjectId, int examId)
         {
             var studentIDs = _applicationDbContext.StudentClassSections.Where(x => x.ClassName == className
             && (x.Section == section || String.IsNullOrEmpty(section))
             && x.AcademicYear == acedemicYearId)
                 .Select(s => s.RollNo).ToList();
             var res = _applicationDbContext.StudentMarks.Where(x => studentIDs.Contains(x.RollNo)
-            && x.Subject == subject
+            && x.SubjectId == subjectId
+            && x.ExamId == examId
             && x.AcedamicYearId == acedemicYearId).ToList();
             return res;
         }
@@ -98,13 +99,16 @@ namespace School.API.Core.Services
             return "Removed Successfully";
         }
 
-        public List<SubjectResponseModel> classSubjectWithTeacherAssign()
+        public List<SubjectResponseModel> classSubjectWithTeacherAssign(int classId, int academicYearId, int? sectionId)
         {
             var res = _applicationDbContext.ClassAssignSubjectTeachers
                 .AsNoTracking()
                 .Include(x => x.Classes)
                 .Include(x => x.Subject)
                 .Include(x => x.Section)
+                .Where(x => x.ClassId == classId
+                    && x.academicYearId == academicYearId
+                    && (x.SectionId == sectionId || sectionId == null))
                 .Select(y => new SubjectResponseModel
                 {
                     Id = y.Id,
@@ -123,24 +127,27 @@ namespace School.API.Core.Services
             return res;
         }
 
-        public string createClassSubjectWithTeacherAssign(SubjectRequestModel subjectRequestModel)
+        public string createClassSubjectWithTeacherAssign(List<SubjectRequestModel> subjectRequestModel)
         {
             var model = _mapper.Map<ClassAssignSubjectTeacher>(subjectRequestModel);
-            _applicationDbContext.ClassAssignSubjectTeachers.Add(model);
+            _applicationDbContext.ClassAssignSubjectTeachers.AddRange(model);
             _applicationDbContext.SaveChanges();
             return "Saved Successfully";
         }
 
-        public string updateClassSubjectWithTeacherAssign(ClassAssignSubjectTeacher classAssignSubjectTeacher)
+        public string updateClassSubjectWithTeacherAssign(List<SubjectRequestModel> classAssignSubjectTeacher)
         {
-            var rec = _applicationDbContext.ClassAssignSubjectTeachers.FirstOrDefault(x => x.Id.Equals(classAssignSubjectTeacher.Id));
-            if (rec is null)
+            foreach (var item in classAssignSubjectTeacher)
             {
-                throw new EntityInvalidException("Class Subject update", "Record not found.");
+                var rec = _applicationDbContext.ClassAssignSubjectTeachers.FirstOrDefault(x => x.Id.Equals(item.Id));
+                if (rec is null)
+                {
+                    throw new EntityInvalidException("Class Subject update", "Record not found.");
+                }
+                rec.IsClassTeacher = item.IsClassTeacher;
+                rec.SubjectTeacherId = item.SubjectTeacherId;
+                _applicationDbContext.SaveChanges();
             }
-            rec.IsClassTeacher = classAssignSubjectTeacher.IsClassTeacher;
-            rec.SubjectTeacherId = classAssignSubjectTeacher.SubjectTeacherId;
-            _applicationDbContext.SaveChanges();
             return "Saved Successfully";
         }
 

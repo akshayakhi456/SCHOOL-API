@@ -90,7 +90,7 @@ namespace School.API.Core.Services
                     }
                     else if (item.Status)
                     {
-                        teacherExperience.SchooolName = item.SchooolName;
+                        teacherExperience.SchoolName = item.SchoolName;
                         teacherExperience.StartEndDate = item.StartEndDate;
                         teacherExperience.Designation = item.Designation;
                         _applicationDbContext.SaveChanges();

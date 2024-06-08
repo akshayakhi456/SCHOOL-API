@@ -1,7 +1,9 @@
-﻿using School.API.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using School.API.Common;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.ExamRequestResponseModel;
 
 namespace School.API.Core.Services
 {
@@ -36,14 +38,33 @@ namespace School.API.Core.Services
             return "Saved Successfully";
         }
 
-        public List<ExamSubjectSchedule> examSubjectSchedules(int academicYearId, int classId, int examId)
-        {
-            var record = _applicationDbContext.ExamSubjectSchedules.Where(exam =>
-            exam.academicYearId == academicYearId &&
+       public List<ExamResponseModel> examSubjectSchedules(int academicYearId, int classId, int examId)
+{
+    var records = _applicationDbContext.ExamSubjectSchedules
+        .AsNoTracking()
+        .Include(x => x.Subject)
+        .Where(exam =>
+            exam.AcademicYearId == academicYearId &&
             exam.ClassId == classId &&
             exam.ExamId == examId
-            ).ToList();
-            return record;
-        }
+        )
+        .Select(x => new ExamResponseModel
+        {
+            AcademicYearId = x.AcademicYearId,
+            ExamId = x.ExamId,
+            WillExamConduct = x.WillExamConduct,
+            ClassId = x.ClassId,
+            ExamDate = x.ExamDate,
+            Id = x.Id,
+            IsAddInTotal = x.IsAddInTotal,
+            MaxMarks = x.MaxMarks,
+            MinMarks = x.MinMarks,
+            SubjectId = x.SubjectId,
+            SubjectName = x.Subject.SubjectName
+        })
+        .ToList();
+
+    return records;
+}
     }
 }

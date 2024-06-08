@@ -51,11 +51,11 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("getMarksByClass")]
-        public IActionResult GetMarksByID([FromQuery] string className, string section, int acedemicYearId, string subject)
+        public IActionResult GetMarksByID([FromQuery] string className, string section, int acedemicYearId, int subjectId, int examId)
         {
             try
             {
-                var res = _subject.getMarksByClass(className, section, acedemicYearId,subject);
+                var res = _subject.getMarksByClass(className, section, acedemicYearId,subjectId,examId);
                 return StatusCode(200, new APIResponse<List<StudentMarks>>((int)HttpStatusCode.OK, "Subject Marks list", res));
             }
             catch (Exception ex)
@@ -66,11 +66,11 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("SubjectTeacher")]
-        public IActionResult GetSubjectTeachers()
+        public IActionResult GetSubjectTeachers([FromQuery] int classId, int academicYearId, int? sectionId)
         {
             try
             {
-                var res = _subject.classSubjectWithTeacherAssign();
+                var res = _subject.classSubjectWithTeacherAssign(classId, academicYearId, sectionId);
                 return StatusCode(200, new APIResponse<List<SubjectResponseModel>>((int)HttpStatusCode.OK, "Get Subject Exams", res));
             }
             catch (Exception ex)
@@ -81,12 +81,27 @@ namespace School.API.Controllers
 
         [HttpPost]
         [Route("SubjectTeacher")]
-        public IActionResult SaveSubjectTeacher(SubjectRequestModel subjectRequestModel)
+        public IActionResult SaveSubjectTeacher(List<SubjectRequestModel> subjectRequestModel)
         {
             try
             {
                 var res = _subject.createClassSubjectWithTeacherAssign(subjectRequestModel);
-                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Save subject Exams", res));
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Save subject Teacher", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPut]
+        [Route("SubjectTeacher")]
+        public IActionResult UpdateSubjectTeacher(List<SubjectRequestModel> subjectRequestModel)
+        {
+            try
+            {
+                var res = _subject.updateClassSubjectWithTeacherAssign(subjectRequestModel);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Update subject Teacher", res));
             }
             catch (Exception ex)
             {
@@ -95,7 +110,7 @@ namespace School.API.Controllers
         }
 
         [HttpDelete]
-        [Route("SubjectTeacher")]
+        [Route("SubjectTeacher/{id}")]
         public IActionResult DeleteSubjectTeacher(int id)
         {
             try
@@ -141,7 +156,7 @@ namespace School.API.Controllers
         }
 
         [HttpDelete]
-        [Route("classSubject")]
+        [Route("classSubject/{id}")]
         public IActionResult DeleteExamName(int id)
         {
             try
