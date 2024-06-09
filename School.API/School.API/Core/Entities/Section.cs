@@ -8,10 +8,8 @@ namespace School.API.Core.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id {  get; set; }
-
-        [Required]
         public string section { get; set; }
-
-        public string className { get; set; }
+        public int? ClassesId { get; set; }
+        public virtual Classes Classes { get; set; }
     }
 }

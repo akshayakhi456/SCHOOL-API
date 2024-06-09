@@ -7,7 +7,7 @@ namespace School.API.Core.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int id { get; set; }
+        public int Id { get; set; }
         public string className { get; set; }
     }
 }

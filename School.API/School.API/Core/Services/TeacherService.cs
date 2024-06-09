@@ -54,7 +54,7 @@ namespace School.API.Core.Services
         public AddTeacherRequest getTeacherById(int id)
         {
             var detail = _applicationDbContext.TeacherDetails.FirstOrDefault(x => x.Id.Equals(id));
-            var experience = _applicationDbContext.TeacherExperiences.Where(x => x.EmpId.Equals(id)).ToList();
+            var experience = _applicationDbContext.TeacherExperiences.Where(x => x.EmpId.Equals(id.ToString())).ToList();
             AddTeacherRequest teacher = new AddTeacherRequest();
             teacher.TeacherDetails = detail;
             teacher.TeacherExperience = experience;

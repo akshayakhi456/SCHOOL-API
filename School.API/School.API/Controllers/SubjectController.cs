@@ -85,7 +85,8 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _subject.createClassSubjectWithTeacherAssign(subjectRequestModel);
+                var model = _mapper.Map<List<ClassAssignSubjectTeacher>>(subjectRequestModel);
+                var res = _subject.createClassSubjectWithTeacherAssign(model);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Save subject Teacher", res));
             }
             catch (Exception ex)
@@ -100,7 +101,8 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _subject.updateClassSubjectWithTeacherAssign(subjectRequestModel);
+                var model = _mapper.Map<List<ClassAssignSubjectTeacher>>(subjectRequestModel);
+                var res = _subject.updateClassSubjectWithTeacherAssign(model);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Update subject Teacher", res));
             }
             catch (Exception ex)

@@ -1,7 +1,9 @@
-﻿using School.API.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using School.API.Common;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.SettingRequestResponseModel;
 using Section = School.API.Core.Entities.Section;
 
 namespace School.API.Core.Services
@@ -16,7 +18,7 @@ namespace School.API.Core.Services
         {
             if (classes is not null )
             {
-                var isExistClass = _applicationDbContext.classes.Any(c => c.className == classes.className);
+                var isExistClass = _applicationDbContext.classes.Any(c => c.Id == classes.Id);
                 if (isExistClass)
                 {
                     throw new EntityInvalidException("NotValid", "Already Class Exist");
@@ -47,7 +49,7 @@ namespace School.API.Core.Services
 
         public bool deleteClass(int id)
         {
-            var rec = _applicationDbContext.classes.Where(x => x.id == id).FirstOrDefault();
+            var rec = _applicationDbContext.classes.Where(x => x.Id == id).FirstOrDefault();
             _applicationDbContext.classes.Remove(rec);
             _applicationDbContext.SaveChanges();
             return true;
@@ -57,7 +59,7 @@ namespace School.API.Core.Services
         {
             if (section is not null)
             {
-                var isExistSection = _applicationDbContext.section.Any(x => x.section == section.section && x.className == section.className);
+                var isExistSection = _applicationDbContext.section.Any(x => x.section == section.section && x.ClassesId == section.ClassesId);
                 if (isExistSection) {
                     throw new EntityInvalidException("section","Already Section Exist");
                 }
@@ -68,14 +70,35 @@ namespace School.API.Core.Services
             throw new EntityInvalidException("Something went wrong");
         }
 
-        public List<Section> getSections()
+        public List<SectionResponseModel> getSections()
         {
-            return _applicationDbContext.section.ToList();
+            return _applicationDbContext.section
+                .AsNoTracking()
+                .Include(x => x.Classes)
+                .Select(x => new SectionResponseModel
+                {
+                    ClassesId = x.ClassesId ?? 0,
+                    id = x.id,
+                    section = x.section,
+                    ClassName = x.Classes.className
+                })
+                .ToList();
         }
 
-        public List<Section> getSectionsByClassName(string className)
+        public List<SectionResponseModel> getSectionsByClassName(int classId)
         {
-            return _applicationDbContext.section.Where(x=>x.className == className).ToList();
+            return _applicationDbContext.section
+                .AsNoTracking()
+                .Include(x => x.Classes)
+                .Where(x=>x.ClassesId == classId)
+                .Select(x => new SectionResponseModel
+                {
+                    ClassesId = x.ClassesId ?? 0,
+                    id = x.id,
+                    section = x.section,
+                    ClassName = x.Classes.className
+                })
+                .ToList();
         }
 
         public bool updateSection(Section section)

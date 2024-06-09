@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using School.API.Common;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.SettingRequestResponseModel;
 using School.API.Core.Models.Wrappers;
 using System.Net;
 
@@ -15,9 +16,11 @@ namespace School.API.Controllers
     public class SettingsController : ControllerBase
     {
         private readonly ISettings _settings;
-        public SettingsController(ISettings settings)
+        private readonly IMapper _mapper;
+        public SettingsController(ISettings settings, IMapper mapper)
         {
             _settings = settings;
+            _mapper = mapper;
         }
         [HttpGet]
         [Route("classes")]
@@ -113,12 +116,12 @@ namespace School.API.Controllers
         }
 
         [HttpGet]
-        [Route("classes/{className}/sections")]
-        public IActionResult GetSectionById(string className)
+        [Route("classes/{classId}/sections")]
+        public IActionResult GetSectionById(int classId)
         {
             try
             {
-                var res = _settings.getSectionsByClassName(className);
+                var res = _settings.getSectionsByClassName(classId);
                 return CreatedAtAction(nameof(GetClass), new { res });
             }
             catch (Exception ex)
@@ -129,11 +132,12 @@ namespace School.API.Controllers
 
         [HttpPost]
         [Route("section")]
-        public IActionResult CreateSection(Section section)
+        public IActionResult CreateSection(SectionRequestModel sectionRequestModel)
         {
             try
             {
-                var res = _settings.createSection(section);
+                var model = _mapper.Map<Section>(sectionRequestModel);
+                var res = _settings.createSection(model);
                 return CreatedAtAction(nameof(GetClass), new { message = res });
             }
             catch (Exception ex)
@@ -144,11 +148,12 @@ namespace School.API.Controllers
 
         [HttpPut]
         [Route("section")]
-        public IActionResult UpdateSection(Section section)
+        public IActionResult UpdateSection(SectionRequestModel sectionRequestModel)
         {
             try
             {
-                var res = _settings.updateSection(section);
+                var model = _mapper.Map<Section>(sectionRequestModel);
+                var res = _settings.updateSection(model);
                 return CreatedAtAction(nameof(GetClass), new { message = res });
             }
             catch (Exception ex)

@@ -13,8 +13,8 @@ namespace School.API.Core.Interfaces
         string deleteClassWiseSubject(int id);
         string addClassWiseSubjects(ClassWiseSubjects classWiseSubjects);
         List<SubjectResponseModel> classSubjectWithTeacherAssign(int classId, int academicYearId, int? sectionId);
-        string createClassSubjectWithTeacherAssign(List<SubjectRequestModel> subjectRequestModel);
-        string updateClassSubjectWithTeacherAssign(List<SubjectRequestModel> classWiseSubjectTeachers);
+        string createClassSubjectWithTeacherAssign(List<ClassAssignSubjectTeacher> classAssignSubjectTeacher);
+        string updateClassSubjectWithTeacherAssign(List<ClassAssignSubjectTeacher> classWiseSubjectTeachers);
         string deleteClassSubjectWithTeacherAssign(int id);
         IReadOnlyList<ClassWiseSubjectResponse> getClassSubject(int academicYearId, int classId);
     }

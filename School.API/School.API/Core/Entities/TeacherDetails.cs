@@ -1,7 +1,10 @@
-﻿namespace School.API.Core.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace School.API.Core.Entities
 {
     public class TeacherDetails
     {
+        [Key]
         public int Id { get; set; }
         public string EmpId { get; set; }
         public string FirstName { get; set; }

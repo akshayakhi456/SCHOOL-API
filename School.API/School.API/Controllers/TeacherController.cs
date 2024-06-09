@@ -59,7 +59,7 @@ namespace School.API.Controllers
             }
         }
         [HttpGet]
-        [Route("EmployeeApproval/{id}")]
+        [Route("employeeApproval/{id}")]
         public IActionResult EmployeeApproval(int id)
         {
             try
@@ -73,7 +73,7 @@ namespace School.API.Controllers
             }
         }
         [HttpGet]
-        [Route("GetEmployeeById/{id}")]
+        [Route("getEmployeeById/{id}")]
         public IActionResult GetTeacherById(int id)
         {
             try

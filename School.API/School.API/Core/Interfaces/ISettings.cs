@@ -1,4 +1,5 @@
 ﻿using School.API.Core.Entities;
+using School.API.Core.Models.SettingRequestResponseModel;
 using School.API.Core.Models.SettingsRequestRespnseModel;
 
 namespace School.API.Core.Interfaces
@@ -11,8 +12,8 @@ namespace School.API.Core.Interfaces
         List<Classes> getClasses();
         bool deleteClass(int id);
         string createSection(Section section);
-        List<Section> getSections();
-        List<Section> getSectionsByClassName(string className);
+        List<SectionResponseModel> getSections();
+        List<SectionResponseModel> getSectionsByClassName(int classId);
         bool updateSection(Section section);
         bool deleteSection(int id);
         List<EnquiryQuestions> getAllEnquiryQuestion();

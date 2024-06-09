@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using School.API.Core.DbContext;
 
@@ -11,9 +12,11 @@ using School.API.Core.DbContext;
 namespace School.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240609061858_classTeacherMap")]
+    partial class classTeacherMap
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,7 +239,10 @@ namespace School.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClassesId")
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Classesid")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsClassTeacher")
@@ -248,6 +254,9 @@ namespace School.API.Migrations
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SubjectTeacherId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TeacherDetailsId")
                         .HasColumnType("int");
 
@@ -256,7 +265,7 @@ namespace School.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassesId");
+                    b.HasIndex("Classesid");
 
                     b.HasIndex("SectionId");
 
@@ -293,17 +302,17 @@ namespace School.API.Migrations
 
             modelBuilder.Entity("School.API.Core.Entities.Classes", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("className")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
                     b.ToTable("classes");
                 });
@@ -722,16 +731,15 @@ namespace School.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int?>("ClassesId")
-                        .HasColumnType("int");
+                    b.Property<string>("className")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("section")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
-
-                    b.HasIndex("ClassesId");
 
                     b.ToTable("section");
                 });
@@ -1224,7 +1232,7 @@ namespace School.API.Migrations
                 {
                     b.HasOne("School.API.Core.Entities.Classes", "Classes")
                         .WithMany()
-                        .HasForeignKey("ClassesId")
+                        .HasForeignKey("Classesid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1275,15 +1283,6 @@ namespace School.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("School.API.Core.Entities.Section", b =>
-                {
-                    b.HasOne("School.API.Core.Entities.Classes", "Classes")
-                        .WithMany()
-                        .HasForeignKey("ClassesId");
-
-                    b.Navigation("Classes");
                 });
 #pragma warning restore 612, 618
         }

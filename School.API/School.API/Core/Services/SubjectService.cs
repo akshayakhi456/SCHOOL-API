@@ -106,18 +106,18 @@ namespace School.API.Core.Services
                 .Include(x => x.Classes)
                 .Include(x => x.Subject)
                 .Include(x => x.Section)
-                .Where(x => x.ClassId == classId
+                .Where(x => x.ClassesId == classId
                     && x.academicYearId == academicYearId
                     && (x.SectionId == sectionId || sectionId == null))
                 .Select(y => new SubjectResponseModel
                 {
                     Id = y.Id,
                     academicYearId = y.academicYearId,
-                    ClassId = y.ClassId,
+                    ClassesId = y.ClassesId,
                     IsClassTeacher = y.IsClassTeacher,
                     SectionId = y.SectionId,
                     SubjectId = y.SubjectId,
-                    SubjectTeacherId = y.SubjectTeacherId,
+                    TeacherDetailsId = y.TeacherDetailsId,
                     ClassName = y.Classes.className,
                     Section = y.Section.section,
                     Subject = y.Subject.SubjectName,
@@ -127,15 +127,14 @@ namespace School.API.Core.Services
             return res;
         }
 
-        public string createClassSubjectWithTeacherAssign(List<SubjectRequestModel> subjectRequestModel)
+        public string createClassSubjectWithTeacherAssign(List<ClassAssignSubjectTeacher> subjectRequestModel)
         {
-            var model = _mapper.Map<ClassAssignSubjectTeacher>(subjectRequestModel);
-            _applicationDbContext.ClassAssignSubjectTeachers.AddRange(model);
+            _applicationDbContext.ClassAssignSubjectTeachers.AddRange(subjectRequestModel);
             _applicationDbContext.SaveChanges();
             return "Saved Successfully";
         }
 
-        public string updateClassSubjectWithTeacherAssign(List<SubjectRequestModel> classAssignSubjectTeacher)
+        public string updateClassSubjectWithTeacherAssign(List<ClassAssignSubjectTeacher> classAssignSubjectTeacher)
         {
             foreach (var item in classAssignSubjectTeacher)
             {
@@ -145,7 +144,7 @@ namespace School.API.Core.Services
                     throw new EntityInvalidException("Class Subject update", "Record not found.");
                 }
                 rec.IsClassTeacher = item.IsClassTeacher;
-                rec.SubjectTeacherId = item.SubjectTeacherId;
+                rec.TeacherDetailsId = item.TeacherDetailsId;
                 _applicationDbContext.SaveChanges();
             }
             return "Saved Successfully";
