@@ -10,7 +10,7 @@ namespace School.API.Core.Interfaces
         List<StudentAttendance> getStudentAttendance(AttendanceRequestModel attendanceRequestModel);
         List<StudentAttendance> GetStudentAttendanceByMonthYear(StudentAttendanceMonthlyRequestModel attendanceRequestModel);
         string studentAssignSection(List<StudentClassSection> studentClassSections);
-        List<StudentClassSection> getListOfStudent(string ClassName, string section, int academicYearId);
+        List<StudentMapClassResponseModel> getListOfStudent(int ClassId, int? section, int academicYearId);
 
     }
 }

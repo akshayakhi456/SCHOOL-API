@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
@@ -12,10 +13,12 @@ namespace School.API.Controllers
     [ApiController]
     public class StudentMapTeacherController : ControllerBase
     {
-        private IStudentMapTeacher _studentMapTeacher;
-        public StudentMapTeacherController(IStudentMapTeacher studentMapTeacher)
+        private readonly IStudentMapTeacher _studentMapTeacher;
+        private readonly IMapper _mapper;
+        public StudentMapTeacherController(IStudentMapTeacher studentMapTeacher, IMapper mapper)
         {
             _studentMapTeacher = studentMapTeacher;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -80,10 +83,11 @@ namespace School.API.Controllers
 
         [HttpPost]
         [Route("StudentAssignSection")]
-        public IActionResult studentAssignSection(List<StudentClassSection> studentClassSections)
+        public IActionResult studentAssignSection(List<StudentMapClassRequestModel> studentMapClassRequestModels)
         {
             try
             {
+                var studentClassSections = _mapper.Map<List<StudentClassSection>>(studentMapClassRequestModels);
                 var result = _studentMapTeacher.studentAssignSection(studentClassSections);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Student Assign Section", result));
             }
@@ -95,12 +99,12 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("StudentAssignSection")]
-        public IActionResult getListOfStudent([FromQuery]string ClassName, string? section, int academicYearId)
+        public IActionResult getListOfStudent([FromQuery]int ClassName, int? section, int academicYearId)
         {
             try
             {
                 var result = _studentMapTeacher.getListOfStudent(ClassName, section, academicYearId);
-                return StatusCode(200, new APIResponse<List<StudentClassSection>>((int)HttpStatusCode.OK, "Student Assign Section", result));
+                return StatusCode(200, new APIResponse<List<StudentMapClassResponseModel>>((int)HttpStatusCode.OK, "Student Assign Section", result));
             }
             catch (Exception ex)
             {

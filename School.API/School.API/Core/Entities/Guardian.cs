@@ -15,7 +15,7 @@ namespace School.API.Core.Entities
         public long? contactNumber {  get; set; }
         public string? email { get; set; }
         public string? adharNumber { get; set; }
-        public string? studentId { get; set; }
+        public int? studentId { get; set; }
 
         public string? relationship { get; set; }
 

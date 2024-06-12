@@ -4,6 +4,7 @@ using School.API.Common;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.StudentMapTeacherRequestResponseModel;
 using School.API.Core.Models.SubjectRequestResponseModel;
 
 namespace School.API.Core.Services
@@ -45,17 +46,87 @@ namespace School.API.Core.Services
             return res;
         }
 
-        public List<StudentMarks> getMarksByClass(string className, string section, int acedemicYearId, int subjectId, int examId)
+        public List<MarksRequestModel> getMarksByClass(int className, int section, int acedemicYearId, int subjectId, int? examId)
         {
-            var studentIDs = _applicationDbContext.StudentClassSections.Where(x => x.ClassName == className
-            && (x.Section == section || String.IsNullOrEmpty(section))
-            && x.AcademicYear == acedemicYearId)
+            var studentIDs = _applicationDbContext.StudentClassSections.Where(x => x.ClassId == className
+            && (x.SectionId == section || section != null)
+            && x.AcademicYearId == acedemicYearId)
                 .Select(s => s.RollNo).ToList();
-            var res = _applicationDbContext.StudentMarks.Where(x => studentIDs.Contains(x.RollNo)
-            && x.SubjectId == subjectId
-            && x.ExamId == examId
-            && x.AcedamicYearId == acedemicYearId).ToList();
+            var res = _applicationDbContext.StudentMarks
+                .Where(x => studentIDs.Contains(x.RollNo)
+                && (x.SubjectId == subjectId || subjectId == 0)
+                && (x.ExamId == examId || examId == null)
+                && x.AcedamicYearId == acedemicYearId)
+                .Select(x => new MarksRequestModel
+                {
+                    Id=x.Id,
+                    AcedamicYearId=x.AcedamicYearId,
+                    ExamId=x.ExamId,
+                    Marks=x.Marks,
+                    Remarks=x.Remarks,
+                    RollNo=x.RollNo,
+                    Sid=x.Sid,
+                    SName=x.SName,
+                    SubjectId=x.SubjectId
+                })
+                .ToList();
             return res;
+        }
+
+        public List<ProgressCardResponseModel> progressCardInfo(int ClassesId, int ExamId, int AcademicYearId, int? SectionId)
+        {
+            var studentList = _applicationDbContext.StudentClassSections
+                .AsNoTracking()
+                .Include(x => x.Students)
+                .Include(x => x.Section)
+                .ThenInclude(x => x.Classes)
+                .Where(x => x.ClassId == ClassesId
+                && (x.SectionId == SectionId || SectionId != null)
+                && x.AcademicYearId == AcademicYearId).ToList();
+            var guardians = (from student in studentList
+                             join guardian in _applicationDbContext.Guardians on student.Studentsid equals guardian.studentId
+                             select new { guardian }).ToList();
+            var studentInfo = new List<StudentInfo>();
+            foreach (var item in studentList)
+            {
+                var FatherGuardian = guardians.Where(x => x.guardian.studentId == item.Studentsid && x.guardian.relationship == "Father").ToList();
+                var motherGuardian = guardians.Where(x => x.guardian.studentId == item.Studentsid && x.guardian.relationship == "Mother").ToList();
+
+                var std = new StudentInfo();
+                std.FatherName = FatherGuardian.Count() > 0 ? $"{FatherGuardian[0].guardian.FirstName} {FatherGuardian[0].guardian.LastName}" : "";
+                std.MotherName = motherGuardian.Count() > 0 ? $"{motherGuardian[0].guardian.FirstName} {motherGuardian[0].guardian.LastName}" : "";
+                std.DateOfBirth = item.Students.dob;
+                std.Id = item.Id;
+                std.RollNo = item.RollNo;
+                std.Section = item.Section.section;
+                std.StudentName = $"{item.Students.firstName} {item.Students.lastName}";
+                std.AdmNo = item.Students.id;
+                std.ClassName = item.Section.Classes.className;
+                studentInfo.Add(std);
+            }
+
+            var progressCardResponse = new List<ProgressCardResponseModel>();
+            foreach (var item in studentInfo)
+            {
+                var cardResponse = new ProgressCardResponseModel();
+                var subjectInfo = _applicationDbContext.StudentMarks
+                                  .Where(x => x.AcedamicYearId == AcademicYearId && x.ExamId == ExamId)
+                                  .SelectMany(x => _applicationDbContext.ExamSubjectSchedules
+                                          .Where(ess => ess.SubjectId == x.SubjectId && ess.ClassId == ClassesId && ess.Id == ExamId)
+                                          .Select(ess => new SubjectInfo
+                                          {
+                                              Id = x.Id,
+                                              Marks = x.Marks,
+                                              Remarks = x.Remarks,
+                                              SubjectName = x.Subject.SubjectName,
+                                              MaxMarks = ess.MaxMarks,
+                                          }))
+                                      .ToList();
+                cardResponse.StudentInfo = item;
+                cardResponse.SubjectInfos = subjectInfo;
+                progressCardResponse.Add(cardResponse);
+            }
+            return progressCardResponse;
         }
 
         public IReadOnlyList<ClassWiseSubjectResponse> getClassSubject(int academicYearId, int classId)

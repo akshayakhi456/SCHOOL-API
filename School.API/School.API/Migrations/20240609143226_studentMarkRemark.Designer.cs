@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using School.API.Core.DbContext;
 
@@ -11,9 +12,11 @@ using School.API.Core.DbContext;
 namespace School.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240609143226_studentMarkRemark")]
+    partial class studentMarkRemark
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -554,8 +557,8 @@ namespace School.API.Migrations
                     b.Property<string>("relationship")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("studentId")
-                        .HasColumnType("int");
+                    b.Property<string>("studentId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
 
@@ -781,8 +784,9 @@ namespace School.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
+                    b.Property<string>("ClassName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("D1")
                         .HasColumnType("nvarchar(max)");
@@ -884,15 +888,17 @@ namespace School.API.Migrations
                     b.Property<int>("RollNo")
                         .HasColumnType("int");
 
-                    b.Property<int>("SId")
-                        .HasColumnType("int");
+                    b.Property<string>("SId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Section")
-                        .HasColumnType("int");
+                    b.Property<string>("Section")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Year")
                         .IsRequired()
@@ -911,26 +917,37 @@ namespace School.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AcademicYearId")
+                    b.Property<int>("AcademicYear")
                         .HasColumnType("int");
 
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
+                    b.Property<string>("ClassName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RollNo")
                         .HasColumnType("int");
 
-                    b.Property<int>("SectionId")
-                        .HasColumnType("int");
+                    b.Property<string>("SId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Studentsid")
-                        .HasColumnType("int");
+                    b.Property<string>("Section")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SectionId");
-
-                    b.HasIndex("Studentsid");
 
                     b.ToTable("StudentClassSections");
                 });
@@ -997,8 +1014,6 @@ namespace School.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SubjectId");
 
                     b.ToTable("StudentMarks");
                 });
@@ -1276,36 +1291,6 @@ namespace School.API.Migrations
                         .HasForeignKey("ClassesId");
 
                     b.Navigation("Classes");
-                });
-
-            modelBuilder.Entity("School.API.Core.Entities.StudentClassSection", b =>
-                {
-                    b.HasOne("School.API.Core.Entities.Section", "Section")
-                        .WithMany()
-                        .HasForeignKey("SectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("School.API.Core.Entities.Students", "Students")
-                        .WithMany()
-                        .HasForeignKey("Studentsid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Section");
-
-                    b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("School.API.Core.Entities.StudentMarks", b =>
-                {
-                    b.HasOne("School.API.Core.Entities.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Subject");
                 });
 #pragma warning restore 612, 618
         }

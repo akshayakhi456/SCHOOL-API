@@ -21,10 +21,11 @@ namespace School.API.Controllers
         }
         [HttpPost]
         [Route("addMarks")]
-        public IActionResult Create(List<StudentMarks> studentMarks)
+        public IActionResult Create(List<MarksRequestModel> marksRequestModel)
         {
             try
             {
+                var studentMarks = _mapper.Map<List<StudentMarks>>(marksRequestModel);
                 var res = _subject.addMarks(studentMarks);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Subject Marks Save", res));
             }
@@ -51,12 +52,12 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("getMarksByClass")]
-        public IActionResult GetMarksByID([FromQuery] string className, string section, int acedemicYearId, int subjectId, int examId)
+        public IActionResult GetMarksByID([FromQuery] int classId, int sectionId, int acedemicYearId, int subjectId, int? examId)
         {
             try
             {
-                var res = _subject.getMarksByClass(className, section, acedemicYearId,subjectId,examId);
-                return StatusCode(200, new APIResponse<List<StudentMarks>>((int)HttpStatusCode.OK, "Subject Marks list", res));
+                var res = _subject.getMarksByClass(classId, sectionId, acedemicYearId,subjectId,examId);
+                return StatusCode(200, new APIResponse<List<MarksRequestModel>>((int)HttpStatusCode.OK, "Subject Marks list", res));
             }
             catch (Exception ex)
             {
@@ -165,6 +166,21 @@ namespace School.API.Controllers
             {
                 var res = _subject.deleteClassWiseSubject(id);
                 return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Delete Class Wise Subject", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route("getMarksOfStudent")]
+        public IActionResult getMarksOfStudent([FromQuery] int classId, int sectionId, int acedemicYearId, int examId)
+        {
+            try
+            {
+                var res = _subject.progressCardInfo(classId,examId,acedemicYearId,sectionId);
+                return StatusCode(200, new APIResponse<List<ProgressCardResponseModel>>((int)HttpStatusCode.OK, "Marks for Student wise", res));
             }
             catch (Exception ex)
             {

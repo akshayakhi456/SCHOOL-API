@@ -43,7 +43,7 @@ namespace School.API.Core.Services
 
             if (student.guardians.Count() > 0)
             {
-                foreach (var item in student.guardians) { item.studentId = student.students.id.ToString(); }
+                foreach (var item in student.guardians) { item.studentId = student.students.id; }
                 await _applicationDbContext.Guardians.AddRangeAsync(student.guardians);
                 await _applicationDbContext.SaveChangesAsync();
             }
@@ -173,8 +173,8 @@ namespace School.API.Core.Services
             var result = new List<StudentGuardianRequest>();
             foreach (var item in students)
             {
-                var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Father");
-                var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Mother");
+                var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Father");
+                var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Mother");
 
                 result.Add(new StudentGuardianRequest()
                 {
@@ -201,9 +201,9 @@ namespace School.API.Core.Services
             {
                 var studentIds = _applicationDbContext.Guardians
                     .Where(x => x.email == email 
-                    && !string.IsNullOrEmpty(x.studentId)
+                    && x.studentId != null
                     && !string.IsNullOrEmpty(x.email))
-                    .Select(x => int.Parse(x.studentId))
+                    .Select(x => x.studentId)
                     .Distinct()
                     .ToList();
 
@@ -213,8 +213,8 @@ namespace School.API.Core.Services
             }
                 foreach (var item in students)
                 {
-                    var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Father");
-                    var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id.ToString() && x.relationship == "Mother");
+                    var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Father");
+                    var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Mother");
                     var studentAddress = _applicationDbContext.StudentAddresses
                                         .Where(x => x.studentId.Equals(item.id)).SingleOrDefault();
                 result.Add(new StudentGuardianRequest()

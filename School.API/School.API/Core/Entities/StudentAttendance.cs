@@ -3,10 +3,10 @@
     public class StudentAttendance
     {
         public int Id { get; set; }
-        public string SId { get; set; }
+        public int SId { get; set; }
         public int RollNo { get; set; }
-        public string ClassName { get; set; }
-        public string Section { get; set; }
+        public int ClassId { get; set; }
+        public int Section { get; set; }
         public string SName { get; set; }
         public string Month { get; set; }
         public string Year { get; set; }

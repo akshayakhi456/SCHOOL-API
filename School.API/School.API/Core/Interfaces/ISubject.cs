@@ -9,7 +9,7 @@ namespace School.API.Core.Interfaces
 
         List<StudentMarks> getMarksByStudentId(int studentId, int acedemicYearId);
 
-        List<StudentMarks> getMarksByClass(string className, string section, int acedemicYearId, int subjectId, int examId);
+        List<MarksRequestModel> getMarksByClass(int classId, int sectionId, int acedemicYearId, int subjectId, int? examId);
         string deleteClassWiseSubject(int id);
         string addClassWiseSubjects(ClassWiseSubjects classWiseSubjects);
         List<SubjectResponseModel> classSubjectWithTeacherAssign(int classId, int academicYearId, int? sectionId);
@@ -17,5 +17,6 @@ namespace School.API.Core.Interfaces
         string updateClassSubjectWithTeacherAssign(List<ClassAssignSubjectTeacher> classWiseSubjectTeachers);
         string deleteClassSubjectWithTeacherAssign(int id);
         IReadOnlyList<ClassWiseSubjectResponse> getClassSubject(int academicYearId, int classId);
+        List<ProgressCardResponseModel> progressCardInfo(int ClassesId, int ExamId, int AcademicYearId, int? SectionId);
     }
 }

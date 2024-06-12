@@ -1,4 +1,5 @@
-﻿using School.API.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using School.API.Common;
 using School.API.Core.DbContext;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
@@ -57,8 +58,8 @@ namespace School.API.Core.Services
 
             var student = _applicationDbContext.StudentAttendances.Where(x => x.Month == attendanceRequestModel.Month 
             && x.Year == attendanceRequestModel.Year
-            && x.ClassName == attendanceRequestModel.ClassName
-            && (x.Section == attendanceRequestModel.Section || String.IsNullOrEmpty(attendanceRequestModel.Section))).ToList();
+            && x.ClassId == attendanceRequestModel.ClassId
+            && (x.Section == attendanceRequestModel.Section || attendanceRequestModel.Section == null)).ToList();
                 
             return student;
         }
@@ -68,12 +69,12 @@ namespace School.API.Core.Services
             foreach (var studentClassSection in studentClassSections)
             {
                 var sectionWithStudent = _applicationDbContext.StudentClassSections.FirstOrDefault(x =>
-                x.ClassName == studentClassSection.ClassName
-                && x.Section == studentClassSection.Section
-                && x.SId == studentClassSection.SId);
+                x.ClassId == studentClassSection.ClassId
+                && x.SectionId == studentClassSection.SectionId
+                && x.Studentsid == studentClassSection.Studentsid);
                 if (sectionWithStudent is StudentClassSection)
                 {
-                    sectionWithStudent.Section = studentClassSection.Section;
+                    sectionWithStudent.SectionId = studentClassSection.SectionId;
                     sectionWithStudent.RollNo = studentClassSection.RollNo;
                     _applicationDbContext.SaveChanges();
                 }
@@ -86,11 +87,28 @@ namespace School.API.Core.Services
             return "Student RollNo And Section Assigned Successfully";
         }
 
-        public List<StudentClassSection> getListOfStudent(string ClassName, string section, int academicYearId)
+        public List<StudentMapClassResponseModel> getListOfStudent(int ClassName, int? section, int academicYearId)
         {
-            var result = _applicationDbContext.StudentClassSections.Where(x => x.ClassName == ClassName 
-            && (x.Section == section || section == null)
-            && x.AcademicYear == academicYearId).ToList();
+            var result = _applicationDbContext.StudentClassSections
+                .AsNoTracking()
+                .Include(x => x.Students)
+                .Where(x => x.ClassId == ClassName 
+                && (x.SectionId == section || section == null)
+                && x.AcademicYearId == academicYearId)
+                .Join(_applicationDbContext.Guardians, student => student.Studentsid, guardian => guardian.studentId, (student, guardian) => 
+                new StudentMapClassResponseModel
+                {
+                    AcademicYearId = student.AcademicYearId,
+                    ClassId = student.ClassId,
+                    Id = student.Id,
+                    RollNo = student.RollNo,
+                    SectionId = student.SectionId,
+                    StudentName = student.Students.firstName +" "+ student.Students.lastName,
+                    Studentsid = student.Studentsid,
+                    Section = student.Section.section,
+                })
+                .Distinct()
+                .ToList();
             return result;
         }
 

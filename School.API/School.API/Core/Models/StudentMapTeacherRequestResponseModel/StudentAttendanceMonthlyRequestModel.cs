@@ -2,9 +2,9 @@
 {
     public class StudentAttendanceMonthlyRequestModel
     {
-        public string? SId { get; set; }
-        public string? ClassName { get; set; }
-        public string? Section { get; set; }
+        public int? SId { get; set; }
+        public int? ClassName { get; set; }
+        public int? Section { get; set; }
         public int StartMonth { get; set; }
         public string StartYear { get; set; }
         public int? EndMonth { get; set; }
