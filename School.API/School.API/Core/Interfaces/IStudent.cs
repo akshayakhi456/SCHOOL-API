@@ -12,5 +12,9 @@ namespace School.API.Core.Interfaces
         Task<bool> update(StudentGuardianRequest student);
         List<StudentGuardianRequest> GetStudentsByRole(string role, string email);
         List<StudentGuardianRequest> StudentsByClassName(string className);
+        string ApplyLeave(StudentLeave studentLeave);
+        string ApproveLeave(int id);
+        List<StudentLeave> GetStudentLeave(int academicYearId, int sid);
+        List<StudentLeave> GetStudentLeaveForTeacher(int academicYearId, int classId, int? section);
     }
 }

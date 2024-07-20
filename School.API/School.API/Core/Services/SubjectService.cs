@@ -73,15 +73,16 @@ namespace School.API.Core.Services
             return res;
         }
 
-        public List<ProgressCardResponseModel> progressCardInfo(int ClassesId, int ExamId, int AcademicYearId, int? SectionId)
+        public List<ProgressCardResponseModel> progressCardInfo(int? ClassesId, int? SectionId, int? ExamId, int AcademicYearId, int? sid)
         {
             var studentList = _applicationDbContext.StudentClassSections
                 .AsNoTracking()
                 .Include(x => x.Students)
                 .Include(x => x.Section)
                 .ThenInclude(x => x.Classes)
-                .Where(x => x.ClassId == ClassesId
-                && (x.SectionId == SectionId || SectionId != null)
+                .Where(x => ((x.ClassId == ClassesId
+                && (x.SectionId == SectionId || SectionId != null))
+                || x.Studentsid == sid)
                 && x.AcademicYearId == AcademicYearId).ToList();
             var guardians = (from student in studentList
                              join guardian in _applicationDbContext.Guardians on student.Studentsid equals guardian.studentId
@@ -105,12 +106,17 @@ namespace School.API.Core.Services
                 studentInfo.Add(std);
             }
 
+            if(sid > 0)
+            {
+                ClassesId = studentList.FirstOrDefault(x => x.Studentsid == sid).ClassId;
+            }
+
             var progressCardResponse = new List<ProgressCardResponseModel>();
             foreach (var item in studentInfo)
             {
                 var cardResponse = new ProgressCardResponseModel();
                 var subjectInfo = _applicationDbContext.StudentMarks
-                                  .Where(x => x.AcedamicYearId == AcademicYearId && x.ExamId == ExamId)
+                                  .Where(x => x.AcedamicYearId == AcademicYearId && x.ExamId == ExamId && (x.Sid == sid || sid == null))
                                   .SelectMany(x => _applicationDbContext.ExamSubjectSchedules
                                           .Where(ess => ess.SubjectId == x.SubjectId && ess.ClassId == ClassesId && ess.Id == ExamId)
                                           .Select(ess => new SubjectInfo

@@ -17,6 +17,6 @@ namespace School.API.Core.Interfaces
         string updateClassSubjectWithTeacherAssign(List<ClassAssignSubjectTeacher> classWiseSubjectTeachers);
         string deleteClassSubjectWithTeacherAssign(int id);
         IReadOnlyList<ClassWiseSubjectResponse> getClassSubject(int academicYearId, int classId);
-        List<ProgressCardResponseModel> progressCardInfo(int ClassesId, int ExamId, int AcademicYearId, int? SectionId);
+        List<ProgressCardResponseModel> progressCardInfo(int? ClassesId, int? SectionId, int? ExamId, int AcademicYearId, int? sid);
     }
 }

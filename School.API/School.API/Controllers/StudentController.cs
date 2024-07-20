@@ -142,5 +142,65 @@ namespace School.API.Controllers
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
+
+        [HttpPost]
+        [Route("LeaveApproval/{id}")]
+        public IActionResult StudentLeaveApply([FromRoute]int id)
+        {
+            try
+            {
+                var res = _studentService.ApproveLeave(id);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Student Leave Apply", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("ApplyLeave")]
+        public IActionResult StudentLeaveApprove(StudentLeave studentLeave)
+        {
+            try
+            {
+                var res = _studentService.ApplyLeave(studentLeave);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Student Leave Apply", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route("GetStudentLeave")]
+        public IActionResult GetStudentLeave([FromQuery]int academicYearId, int sid)
+        {
+            try
+            {
+                var res = _studentService.GetStudentLeave(academicYearId, sid);
+                return StatusCode(200, new APIResponse<List<StudentLeave>>((int)HttpStatusCode.OK, "Get Student Leave Apply", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route("GetStudentLeaveForTeacher")]
+        public IActionResult GetStudentLeaveForTeacher([FromQuery]int academicYearId, int classId, int sectionId)
+        {
+            try
+            {
+                var res = _studentService.GetStudentLeaveForTeacher(academicYearId, classId, sectionId);
+                return StatusCode(200, new APIResponse<List<StudentLeave>>((int)HttpStatusCode.OK, "Get Student Leave Apply For Teacher", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
     }
 }
