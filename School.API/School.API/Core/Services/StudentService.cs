@@ -22,7 +22,8 @@ namespace School.API.Core.Services
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IAuthService _authService;
         private readonly ISendMail _sendMail;
-        public StudentService(UserManager<ApplicationUser> userManager, IAuthService authService, ApplicationDbContext applicationDbContext, ISendMail sendMail) {
+        public StudentService(UserManager<ApplicationUser> userManager, IAuthService authService, ApplicationDbContext applicationDbContext, ISendMail sendMail)
+        {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
             _authService = authService;
@@ -33,7 +34,7 @@ namespace School.API.Core.Services
             var studentExist = _applicationDbContext.Students.FirstOrDefault(s =>
             s.firstName.Equals(student.students.firstName)
             && s.lastName.Equals(student.students.lastName));
-            if(studentExist is not null)
+            if (studentExist is not null)
             {
                 throw new EntityInvalidException("Student create", "Already student Exist");
             }
@@ -51,11 +52,11 @@ namespace School.API.Core.Services
             student.address.studentId = student.students.id;
             _applicationDbContext.StudentAddresses.Add(student.address);
             await _applicationDbContext.SaveChangesAsync();
-                var fatherDetail = student.guardians.Find(x => x.relationship == "Father");
-                if (fatherDetail != null)
-                {
-                    createUserAccount(fatherDetail);
-                }
+            var fatherDetail = student.guardians.Find(x => x.relationship == "Father");
+            if (fatherDetail != null)
+            {
+                createUserAccount(fatherDetail);
+            }
             return true;
         }
 
@@ -136,7 +137,7 @@ namespace School.API.Core.Services
                 }
             }
             return students;
-        }        
+        }
 
         public async Task<bool> update(StudentGuardianRequest student)
         {
@@ -146,7 +147,8 @@ namespace School.API.Core.Services
 
             if (student.guardians.Count() > 0)
             {
-                foreach (var item in student.guardians) { 
+                foreach (var item in student.guardians)
+                {
                     _applicationDbContext.Guardians.Update(item);
                 }
                 await _applicationDbContext.SaveChangesAsync();
@@ -200,7 +202,7 @@ namespace School.API.Core.Services
             else if (role == StaticUserRoles.PARENT && !string.IsNullOrEmpty(email))
             {
                 var studentIds = _applicationDbContext.Guardians
-                    .Where(x => x.email == email 
+                    .Where(x => x.email == email
                     && x.studentId != null
                     && !string.IsNullOrEmpty(x.email))
                     .Select(x => x.studentId)
@@ -211,19 +213,19 @@ namespace School.API.Core.Services
                     .Where(x => studentIds.Contains(x.id))
                     .ToList();
             }
-                foreach (var item in students)
-                {
-                    var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Father");
-                    var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Mother");
-                    var studentAddress = _applicationDbContext.StudentAddresses
-                                        .Where(x => x.studentId.Equals(item.id)).SingleOrDefault();
+            foreach (var item in students)
+            {
+                var fatherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Father");
+                var motherDetail = _applicationDbContext.Guardians.SingleOrDefault(x => x.studentId == item.id && x.relationship == "Mother");
+                var studentAddress = _applicationDbContext.StudentAddresses
+                                    .Where(x => x.studentId.Equals(item.id)).SingleOrDefault();
                 result.Add(new StudentGuardianRequest()
-                    {
-                        students = item,
-                        guardians = new List<Guardian>() { fatherDetail, motherDetail },
-                        address = studentAddress
-                    });
-                }
+                {
+                    students = item,
+                    guardians = new List<Guardian>() { fatherDetail, motherDetail },
+                    address = studentAddress
+                });
+            }
             return result;
         }
 
@@ -249,6 +251,36 @@ namespace School.API.Core.Services
             request.Subject = "Reset your Skool UI Password";
             request.Body = html.ToString();
             await _sendMail.SendEmailAsync(request);
+        }
+
+        public string ApplyLeave(StudentLeave studentLeave)
+        {
+            _applicationDbContext.StudentLeaves.Add(studentLeave);
+            _applicationDbContext.SaveChanges();
+            return "Leave applied successfully.";
+        }
+
+        public string ApproveLeave(int id)
+        {
+            var rec = _applicationDbContext.StudentLeaves.FirstOrDefault(x => x.Id == id);
+            if (rec == null)
+            {
+                ArgumentException.ThrowIfNullOrEmpty("Invalid Leave Apply");
+            }
+
+            rec.Approval = true;
+            _applicationDbContext.SaveChanges();
+            return "Leave Approval Successfull";
+        }
+
+        public List<StudentLeave> GetStudentLeave(int academicYearId, int sid)
+        {
+            return _applicationDbContext.StudentLeaves.Where(x => x.AcademicYearId == academicYearId && x.StudentId == sid).ToList();
+        }
+
+        public List<StudentLeave> GetStudentLeaveForTeacher(int academicYearId, int classId, int? section)
+        {
+            return _applicationDbContext.StudentLeaves.Where(x => x.AcademicYearId == academicYearId && x.ClassId == classId && (section == null || x.SectionId == section) && x.Approval == false).ToList();
         }
     }
 }

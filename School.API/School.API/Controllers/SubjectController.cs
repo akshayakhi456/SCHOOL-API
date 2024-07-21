@@ -175,11 +175,11 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("getMarksOfStudent")]
-        public IActionResult getMarksOfStudent([FromQuery] int classId, int sectionId, int acedemicYearId, int examId)
+        public IActionResult getMarksOfStudent([FromQuery] int? classId, int? sectionId, int acedemicYearId, int examId, int? sid)
         {
             try
             {
-                var res = _subject.progressCardInfo(classId,examId,acedemicYearId,sectionId);
+                var res = _subject.progressCardInfo(classId, sectionId, examId,acedemicYearId, sid);
                 return StatusCode(200, new APIResponse<List<ProgressCardResponseModel>>((int)HttpStatusCode.OK, "Marks for Student wise", res));
             }
             catch (Exception ex)

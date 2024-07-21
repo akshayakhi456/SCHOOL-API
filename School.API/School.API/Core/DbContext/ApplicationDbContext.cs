@@ -46,6 +46,7 @@ namespace School.API.Core.DbContext
         public virtual DbSet<Exam> Exams { get; set; }
         public virtual DbSet<ExamSubjectSchedule> ExamSubjectSchedules { get; set; }
         public virtual DbSet<ClassWiseSubjects> ClassWiseSubjects { get; set; }
+        public virtual DbSet<StudentLeave> StudentLeaves { get; set; }
 
     }
 }
