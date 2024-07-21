@@ -55,6 +55,7 @@ namespace School.API.Core.Services
             WillExamConduct = x.WillExamConduct,
             ClassId = x.ClassId,
             ExamDate = x.ExamDate,
+            ExamTime = x.ExamTime,
             Id = x.Id,
             IsAddInTotal = x.IsAddInTotal,
             MaxMarks = x.MaxMarks,

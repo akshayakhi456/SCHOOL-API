@@ -70,7 +70,7 @@ namespace School.API.Core.Services
             var studentRecord = _applicationDbContext.Students
                             .Where(x => x.id.Equals(id)).SingleOrDefault();
             var guardianRecords = await _applicationDbContext.Guardians
-                            .Where(x => x.studentId.Equals(id.ToString())).ToListAsync();
+                            .Where(x => x.studentId.Equals(id)).ToListAsync();
             var studentAddress = _applicationDbContext.StudentAddresses
                                     .Where(x => x.studentId.Equals(id)).SingleOrDefault();
             if (studentRecord is Students)

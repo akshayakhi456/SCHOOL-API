@@ -11,6 +11,7 @@
         public bool IsAddInTotal { get; set; }
         public bool WillExamConduct { get; set; }
         public DateTime ExamDate { get; set; }
+        public string ExamTime { get; set; }
         public int AcademicYearId { get; set; }
         public virtual Subject Subject { get; set; }
     }
