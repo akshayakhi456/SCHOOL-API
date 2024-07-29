@@ -1,19 +1,36 @@
-﻿using School.API.Common;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using School.API.Common;
 using School.API.Core.DbContext;
+using School.API.Core.Dtos;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
+using School.API.Core.Models.AuthUserRequestResponseModel;
 using School.API.Core.Models.TeacherRequestResponseModel;
+using School.API.Core.OtherObjects;
+using School.API.Core.UtilityServices.interfaces;
+using System.Text;
 
 namespace School.API.Core.Services
 {
-    public class TeacherService: ITeacher
+    public class TeacherService : ITeacher
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
-        public TeacherService(ApplicationDbContext applicationDbContext) {
-            _applicationDbContext = applicationDbContext;
+        private readonly IAuthService _authService;
+        private readonly ISendMail _sendMail;
+        public TeacherService(UserManager<ApplicationUser> userManager,
+            IAuthService authService,
+            ApplicationDbContext applicationDbContext,
+            ISendMail sendMail)
+        {
+            _applicationDbContext = applicationDbContext; 
+            _userManager = userManager;
+            _authService = authService;
+            _sendMail = sendMail;
         }
 
-        public string create(AddTeacherRequest addTeacherRequest)
+        public async Task<string> create(AddTeacherRequest addTeacherRequest)
         {
             _applicationDbContext.TeacherDetails.Add(addTeacherRequest.TeacherDetails);
             _applicationDbContext.SaveChanges();
@@ -26,6 +43,7 @@ namespace School.API.Core.Services
                 _applicationDbContext.TeacherExperiences.AddRange(addTeacherRequest.TeacherExperience);
                 _applicationDbContext.SaveChanges();
             }
+            await createUserAccount(addTeacherRequest.TeacherDetails);
             return "Teacher Detail saved successfully.";
         }
 
@@ -47,7 +65,7 @@ namespace School.API.Core.Services
         }
 
         public List<TeacherDetails> getTeacherDetails()
-        {            
+        {
             return _applicationDbContext.TeacherDetails.ToList();
         }
 
@@ -72,9 +90,9 @@ namespace School.API.Core.Services
             teacherDetail.PassOutYear = updateTeacherRequest.TeacherDetails.PassOutYear;
             teacherDetail.Email = updateTeacherRequest.TeacherDetails.Email;
 
-            if(updateTeacherRequest.TeacherExperience.Count() > 0)
+            if (updateTeacherRequest.TeacherExperience.Count() > 0)
             {
-                foreach(var item in updateTeacherRequest.TeacherExperience)
+                foreach (var item in updateTeacherRequest.TeacherExperience)
                 {
                     var teacherExperience = _applicationDbContext.TeacherExperiences.FirstOrDefault(x => x.Id == item.Id);
 
@@ -104,7 +122,7 @@ namespace School.API.Core.Services
             }
             return "Teacher Details Updated Successfully";
         }
-        
+
         public string incrementEmpId(string ExistingId)
         {
             string code = ExistingId ?? "E000";
@@ -121,6 +139,31 @@ namespace School.API.Core.Services
 
             return newCode;
 
+        }
+
+        public async Task<bool> createUserAccount(TeacherDetails teacherDetails)
+        {
+            var registerDTO = new RegisterDto();
+            registerDTO.FirstName = teacherDetails.FirstName;
+            registerDTO.LastName = teacherDetails.LastName;
+            registerDTO.Email = teacherDetails.Email;
+            registerDTO.UserName = teacherDetails.FirstName + "" + teacherDetails.LastName.Substring(0, 3);
+            registerDTO.Password = "Password@123";
+            registerDTO.Role = StaticUserRoles.TEACHER;
+
+            await _authService.RegisterAsync(registerDTO);
+
+            StringBuilder html = new StringBuilder();
+            html.Append($"<h4>Hello {teacherDetails.FirstName}</h4><br/>");
+            html.Append($"<p>Below are the credetials to login Skool UI App<p>");
+            html.Append($"<p>UserName: {registerDTO.UserName}</p>");
+            html.Append($"<p>Password: Password@123</p>");
+            MailRequest request = new MailRequest();
+            request.ToEmail = teacherDetails.Email;
+            request.Subject = "Reset your Skool UI Password";
+            request.Body = html.ToString();
+            await _sendMail.SendEmailAsync(request);
+            return true;
         }
     }
 }

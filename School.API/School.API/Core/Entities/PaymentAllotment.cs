@@ -13,7 +13,7 @@ namespace School.API.Core.Entities
         [Required]
         public string amount { get; set; }
         [Required]
-        public string className { get; set; }
+        public int classId { get; set; }
         [Required]
         public int acedamicYearId { get; set; }
 

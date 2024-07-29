@@ -2,6 +2,8 @@
 {
     public class ClassWisePaymentResponseModel
     {
+        public int? classId { get; set; }
+
         public string? className { get; set; }
         public long actualAmount { get; set; }
         public long receivedAmount { get; set; }

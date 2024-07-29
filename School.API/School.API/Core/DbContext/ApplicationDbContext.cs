@@ -1,6 +1,8 @@
 ﻿using School.API.Core.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
+using System.Reflection.Metadata;
 
 namespace School.API.Core.DbContext
 {
@@ -47,6 +49,8 @@ namespace School.API.Core.DbContext
         public virtual DbSet<ExamSubjectSchedule> ExamSubjectSchedules { get; set; }
         public virtual DbSet<ClassWiseSubjects> ClassWiseSubjects { get; set; }
         public virtual DbSet<StudentLeave> StudentLeaves { get; set; }
+
+        public virtual DbSet<TitleHeader> TitleHeaders { get; set; }
 
     }
 }

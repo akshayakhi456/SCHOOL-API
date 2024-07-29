@@ -13,6 +13,9 @@ using System;
 using School.API.Core.UtilityServices;
 using School.API.Core.UtilityServices.interfaces;
 using System.Linq;
+using School.API.Migrations;
+using static System.Collections.Specialized.BitVector32;
+using AutoMapper;
 
 namespace School.API.Core.Services
 {
@@ -22,12 +25,18 @@ namespace School.API.Core.Services
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IAuthService _authService;
         private readonly ISendMail _sendMail;
-        public StudentService(UserManager<ApplicationUser> userManager, IAuthService authService, ApplicationDbContext applicationDbContext, ISendMail sendMail)
+        private readonly IMapper _mapper;
+        public StudentService(UserManager<ApplicationUser> userManager, 
+            IAuthService authService, 
+            ApplicationDbContext applicationDbContext,
+            IMapper mapper,
+            ISendMail sendMail)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
             _authService = authService;
             _sendMail = sendMail;
+            _mapper = mapper;
         }
         public async Task<bool> create(StudentGuardianRequest student)
         {
@@ -55,21 +64,23 @@ namespace School.API.Core.Services
             var fatherDetail = student.guardians.Find(x => x.relationship == "Father");
             if (fatherDetail != null)
             {
-                createUserAccount(fatherDetail);
+                await createUserAccount(fatherDetail);
             }
             return true;
         }
 
         public async Task<List<Students>> list()
         {
-            var res = await _applicationDbContext.Students.ToListAsync();
+            var res = await _applicationDbContext.Students.Include(std => std.classes).ToListAsync();
             return res;
         }
 
         public async Task<StudentGuardianRequest> StudentById(int id)
         {
             var studentRecord = _applicationDbContext.Students
-                            .Where(x => x.id.Equals(id)).SingleOrDefault();
+                            .Include(std => std.classes)
+                            .Where(x => x.id.Equals(id))
+                            .SingleOrDefault();
             var guardianRecords = await _applicationDbContext.Guardians
                             .Where(x => x.studentId.Equals(id)).ToListAsync();
             var studentAddress = _applicationDbContext.StudentAddresses
@@ -169,9 +180,9 @@ namespace School.API.Core.Services
             return bytes;
         }
 
-        public List<StudentGuardianRequest> StudentsByClassName(string className)
+        public List<StudentGuardianRequest> StudentsByClassName(int classId)
         {
-            var students = _applicationDbContext.Students.Where(x => x.className == className).ToList();
+            var students = _applicationDbContext.Students.Include(std => std.classes).Where(x => x.classesId == classId).ToList();
             var result = new List<StudentGuardianRequest>();
             foreach (var item in students)
             {
@@ -197,7 +208,7 @@ namespace School.API.Core.Services
                 role == StaticUserRoles.OWNER ||
                 role == StaticUserRoles.TEACHER)
             {
-                students = _applicationDbContext.Students.ToList();
+                students = _applicationDbContext.Students.Include(std => std.classes).ToList();
             }
             else if (role == StaticUserRoles.PARENT && !string.IsNullOrEmpty(email))
             {
@@ -210,6 +221,7 @@ namespace School.API.Core.Services
                     .ToList();
 
                 students = _applicationDbContext.Students
+                    .Include(std => std.classes)
                     .Where(x => studentIds.Contains(x.id))
                     .ToList();
             }
@@ -229,7 +241,7 @@ namespace School.API.Core.Services
             return result;
         }
 
-        async void createUserAccount(Guardian fatherDetail)
+        async Task<bool> createUserAccount(Guardian fatherDetail)
         {
             var registerDTO = new RegisterDto();
             registerDTO.FirstName = fatherDetail.FirstName;
@@ -251,6 +263,7 @@ namespace School.API.Core.Services
             request.Subject = "Reset your Skool UI Password";
             request.Body = html.ToString();
             await _sendMail.SendEmailAsync(request);
+            return true;
         }
 
         public string ApplyLeave(StudentLeave studentLeave)
@@ -278,9 +291,124 @@ namespace School.API.Core.Services
             return _applicationDbContext.StudentLeaves.Where(x => x.AcademicYearId == academicYearId && x.StudentId == sid).ToList();
         }
 
-        public List<StudentLeave> GetStudentLeaveForTeacher(int academicYearId, int classId, int? section)
+        public List<studentApprovalResponse> GetStudentLeaveForTeacher(int academicYearId, int classId, int? section)
         {
-            return _applicationDbContext.StudentLeaves.Where(x => x.AcademicYearId == academicYearId && x.ClassId == classId && (section == null || x.SectionId == section) && x.Approval == false).ToList();
+            //var student = _applicationDbContext.StudentLeaves.Where(x => x.AcademicYearId == academicYearId && x.ClassId == classId && (section == 0 || x.SectionId == section) && !x.Approval).ToList();
+            //var detail = student.Join(_applicationDbContext.Students,
+            //    studentLeave => studentLeave.StudentId,
+            //    student => student.id,
+            //    (studentLeave, student) => new { studentLeave, student }
+            //    ).Distinct();
+            //var studentClass = detail.Join(_applicationDbContext.StudentClassSections,
+            //    studentDetail => studentDetail.studentLeave.StudentId,
+            //    studentclasssection => studentclasssection.Studentsid,
+            //    (studentDetail, studentclasssection) => new { studentDetail, studentclasssection }
+            //   ).Distinct().ToList();
+            //var result = new List<studentApprovalResponse>();
+            //foreach (var item in studentClass)
+            //{
+            //    result.Add(new studentApprovalResponse
+            //    {
+            //        Id = item.studentDetail.studentLeave.Id,
+            //        StudentId = item.studentDetail.studentLeave.StudentId,
+            //        AcademicYearId = academicYearId,
+            //        ClassId = classId,
+            //        SectionId = section,
+            //        Approval = item.studentDetail.studentLeave.Approval,
+            //        EndDate = item.studentDetail.studentLeave.EndDate,
+            //        NoOfDays = item.studentDetail.studentLeave.NoOfDays,
+            //        PurposeOfLeave = item.studentDetail.studentLeave.PurposeOfLeave,
+            //        Remarks = item.studentDetail.studentLeave.Remarks,
+            //        RollNo = item.studentclasssection.RollNo,
+            //        StartDate = item.studentDetail.studentLeave.StartDate,
+            //        StudentName = $"{item.studentDetail.student.firstName} {item.studentDetail.student.lastName}"
+            //    });
+            //}
+            //return result;
+
+            var result = _applicationDbContext.StudentLeaves
+    .Where(x => x.AcademicYearId == academicYearId &&
+                x.ClassId == classId &&
+                (section == 0 || x.SectionId == section) &&
+                !x.Approval)
+    .Join(_applicationDbContext.Students,
+        studentLeave => studentLeave.StudentId,
+        student => student.id,
+        (studentLeave, student) => new
+        {
+            studentLeave.Id,
+            studentLeave.StudentId,
+            AcademicYearId = academicYearId,
+            ClassId = classId,
+            SectionId = section,
+            studentLeave.Approval,
+            studentLeave.EndDate,
+            studentLeave.NoOfDays,
+            studentLeave.PurposeOfLeave,
+            studentLeave.Remarks,
+            studentLeave.StartDate,
+            StudentName = $"{student.firstName} {student.lastName}"
+        })
+    .Join(_applicationDbContext.StudentClassSections,
+        studentDetail => studentDetail.StudentId,
+        studentclasssection => studentclasssection.Studentsid,
+        (studentDetail, studentclasssection) => new studentApprovalResponse
+        {
+            Id = studentDetail.Id,
+            StudentId = studentDetail.StudentId,
+            AcademicYearId = studentDetail.AcademicYearId,
+            ClassId = studentDetail.ClassId,
+            SectionId = studentDetail.SectionId,
+            Approval = studentDetail.Approval,
+            EndDate = studentDetail.EndDate,
+            NoOfDays = studentDetail.NoOfDays,
+            PurposeOfLeave = studentDetail.PurposeOfLeave,
+            Remarks = studentDetail.Remarks,
+            StudentName = studentDetail.StudentName,
+            RollNo = studentclasssection.RollNo,
+            StartDate = studentDetail.StartDate,
+        })
+        .AsEnumerable()
+        .GroupBy(x => new { x.Id, x.StudentId, x.AcademicYearId, x.ClassId, x.SectionId, x.Approval, x.EndDate, x.NoOfDays, x.PurposeOfLeave, x.Remarks, x.StudentName, x.RollNo, x.StartDate })
+        .Select(x => x.FirstOrDefault() ?? null)
+        .ToList();
+
+            return result;
+
+        }
+
+        public async Task<string> StudentBulkUpload(List<StudentRequestModel> StudentRequestModel)
+        {
+            foreach (var student in StudentRequestModel)
+            {
+                var studentExist = _applicationDbContext.Students.FirstOrDefault(s =>
+               s.firstName.Equals(student.students.firstName)
+               && s.lastName.Equals(student.students.lastName));
+                if (studentExist is not null)
+                {
+                    throw new EntityInvalidException("Student create", "Already student Exist");
+                }
+                var std = _mapper.Map<Students>(student.students);
+                var res = _applicationDbContext.Students.Add(std);
+                await _applicationDbContext.SaveChangesAsync();
+
+                if (student.guardians.Count() > 0)
+                {
+                    foreach (var item in student.guardians) { item.studentId = std.id; }
+                    await _applicationDbContext.Guardians.AddRangeAsync(student.guardians);
+                    await _applicationDbContext.SaveChangesAsync();
+                }
+
+                student.address.studentId = std.id;
+                _applicationDbContext.StudentAddresses.Add(student.address);
+                await _applicationDbContext.SaveChangesAsync();
+                var fatherDetail = student.guardians.Find(x => x.relationship == "Father");
+                if (fatherDetail != null)
+                {
+                    await createUserAccount(fatherDetail);
+                }
+            }
+                return "Students Uploaded Successfully";
         }
     }
 }

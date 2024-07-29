@@ -144,14 +144,14 @@ namespace School.API.Core.Services
             return "Updated Successfully";
         }
 
-        public List<PaymentAllotment> GetPaymentAllotments(string className)
+        public List<PaymentAllotment> GetPaymentAllotments(int classId)
         {
-            return _applicationDbContext.paymentAllotments.Where(x =>x.className == className).ToList();
+            return _applicationDbContext.paymentAllotments.Where(x =>x.classId == classId).ToList();
         }
 
         public string createPaymentAllotment(PaymentAllotment paymentAllotment) 
         {
-            var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.className == paymentAllotment.className);
+            var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.classId == paymentAllotment.classId);
             if (isExistPayment)
             {
                 throw new EntityInvalidException("Already Payment Name Exist");
@@ -162,7 +162,7 @@ namespace School.API.Core.Services
         }
         public string updatePaymentAllotment(PaymentAllotment paymentAllotment)
         {
-            var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.className == paymentAllotment.className && x.id != paymentAllotment.id);
+            var isExistPayment = _applicationDbContext.paymentAllotments.Any(x => x.paymentName == paymentAllotment.paymentName && x.classId == paymentAllotment.classId && x.id != paymentAllotment.id);
             if (isExistPayment)
             {
                 throw new EntityInvalidException("Already Payment Name Exist");

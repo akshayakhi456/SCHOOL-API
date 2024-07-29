@@ -3,6 +3,7 @@ using School.API.Core.Entities;
 using School.API.Core.Models.ExamRequestResponseModel;
 using School.API.Core.Models.SettingRequestResponseModel;
 using School.API.Core.Models.StudentMapTeacherRequestResponseModel;
+using School.API.Core.Models.StudentRequestModel;
 using School.API.Core.Models.SubjectRequestResponseModel;
 
 namespace School.API.Configure
@@ -16,6 +17,7 @@ namespace School.API.Configure
             CreateMap<SubjectRequestModel, ClassAssignSubjectTeacher>();
             CreateMap<ClassWiseSubjectRequestModel, ClassWiseSubjects>();
             CreateMap<ExamRequestModel, ExamSubjectSchedule>();
+            CreateMap<StudentModel, Students>();
         }
     }
 }

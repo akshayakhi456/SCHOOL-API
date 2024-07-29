@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using School.API.Core.Entities;
@@ -8,6 +9,7 @@ using School.API.Core.Models.StudentRequestModel;
 using School.API.Core.Models.Wrappers;
 using System.Net;
 using System.Security.Claims;
+using static System.Collections.Specialized.BitVector32;
 
 
 namespace School.API.Controllers
@@ -18,8 +20,11 @@ namespace School.API.Controllers
     public class StudentController : Controller
     {
         private readonly IStudent _studentService;
-        public StudentController(IStudent studentService) {
+        private IMapper _mapper;
+        public StudentController(IStudent studentService, IMapper mapper)
+        {
             _studentService = studentService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -38,7 +43,7 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetById([FromRoute]int id)
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
             {
@@ -73,7 +78,11 @@ namespace School.API.Controllers
             try
             {
                 var img = fileObj["file"];
-                StudentGuardianRequest oStudentGuardian = JsonConvert.DeserializeObject<StudentGuardianRequest>(fileObj["studentGuardian"]);
+                var result = JsonConvert.DeserializeObject<StudentRequestModel>(fileObj["studentGuardian"]);
+                StudentGuardianRequest oStudentGuardian = new StudentGuardianRequest();
+                oStudentGuardian.students = _mapper.Map<Students>(result.students);
+                oStudentGuardian.address = result.address;
+                oStudentGuardian.guardians = result.guardians;
                 if (!String.IsNullOrEmpty(img))
                 {
                     byte[] imgBytes = System.Convert.FromBase64String(img);
@@ -83,7 +92,8 @@ namespace School.API.Controllers
                 }
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, "failed"));
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
             }
         }
@@ -112,13 +122,13 @@ namespace School.API.Controllers
         }
 
         [HttpGet]
-        [Route("getStudentByClassName/{className}")]
-        public IActionResult GetStudentByClassId([FromRoute]string className)
+        [Route("getStudentByClassName/{classId}")]
+        public IActionResult GetStudentByClassId([FromRoute] int classId)
         {
             try
             {
-                var res = _studentService.StudentsByClassName(className);
-                return StatusCode(200, new APIResponse<List<StudentGuardianRequest>>((int)HttpStatusCode.OK, "Students By ClassName",res));
+                var res = _studentService.StudentsByClassName(classId);
+                return StatusCode(200, new APIResponse<List<StudentGuardianRequest>>((int)HttpStatusCode.OK, "Students By ClassName", res));
             }
             catch (Exception ex)
             {
@@ -145,7 +155,7 @@ namespace School.API.Controllers
 
         [HttpPost]
         [Route("LeaveApproval/{id}")]
-        public IActionResult StudentLeaveApply([FromRoute]int id)
+        public IActionResult StudentLeaveApply([FromRoute] int id)
         {
             try
             {
@@ -175,11 +185,11 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("GetStudentLeave")]
-        public IActionResult GetStudentLeave([FromQuery]int academicYearId, int sid)
+        public IActionResult GetStudentLeave([FromQuery] int academicYearId, int id)
         {
             try
             {
-                var res = _studentService.GetStudentLeave(academicYearId, sid);
+                var res = _studentService.GetStudentLeave(academicYearId, id);
                 return StatusCode(200, new APIResponse<List<StudentLeave>>((int)HttpStatusCode.OK, "Get Student Leave Apply", res));
             }
             catch (Exception ex)
@@ -190,12 +200,27 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("GetStudentLeaveForTeacher")]
-        public IActionResult GetStudentLeaveForTeacher([FromQuery]int academicYearId, int classId, int sectionId)
+        public IActionResult GetStudentLeaveForTeacher([FromQuery] int academicYearId, int classId, int sectionId)
         {
             try
             {
                 var res = _studentService.GetStudentLeaveForTeacher(academicYearId, classId, sectionId);
-                return StatusCode(200, new APIResponse<List<StudentLeave>>((int)HttpStatusCode.OK, "Get Student Leave Apply For Teacher", res));
+                return StatusCode(200, new APIResponse<List<studentApprovalResponse>>((int)HttpStatusCode.OK, "Get Student Leave Apply For Teacher", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("StudentBulkUpload")]
+        public IActionResult BulkUpload(List<StudentRequestModel> StudentRequestModel)
+        {
+            try
+            {
+                var res = _studentService.StudentBulkUpload(StudentRequestModel);
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Student Bulk Upload", res.Result));
             }
             catch (Exception ex)
             {

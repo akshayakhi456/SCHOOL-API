@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace School.API.Core.Entities
+namespace School.API.Core.Models.StudentRequestModel
 {
-    public class Students
+    public class StudentModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
         [Required]
@@ -24,11 +22,10 @@ namespace School.API.Core.Entities
         public string gender { get; set; }
         public byte[] photo { get; set; }
         public long adharNumber { get; set; }
-        public string?  sibilings { get; set; }
-        public string? certificateNames { get;set; }
+        public string? sibilings { get; set; }
+        public string? certificateNames { get; set; }
         public DateTime dateOfJoining { get; set; } = new DateTime();
         public int? CurrentClassName { get; set; }
 
-        public virtual Classes classes { get; set; }
     }
 }

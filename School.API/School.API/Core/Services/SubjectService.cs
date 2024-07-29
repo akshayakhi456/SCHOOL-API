@@ -83,7 +83,9 @@ namespace School.API.Core.Services
                 .Where(x => ((x.ClassId == ClassesId
                 && (x.SectionId == SectionId || SectionId != null))
                 || x.Studentsid == sid)
-                && x.AcademicYearId == AcademicYearId).ToList();
+                && x.AcademicYearId == AcademicYearId)
+                .Distinct()
+                .ToList();
             var guardians = (from student in studentList
                              join guardian in _applicationDbContext.Guardians on student.Studentsid equals guardian.studentId
                              select new { guardian }).ToList();

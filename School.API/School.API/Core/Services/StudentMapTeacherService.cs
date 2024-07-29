@@ -82,6 +82,13 @@ namespace School.API.Core.Services
                 {
                     _applicationDbContext.StudentClassSections.Add(studentClassSection);
                     _applicationDbContext.SaveChanges();
+
+                    var student = _applicationDbContext.Students.First(x => x.id.Equals(studentClassSection.Studentsid));
+                    if (student is Students)
+                    {
+                        student.CurrentClassName = studentClassSection.ClassId;
+                        _applicationDbContext.SaveChanges();
+                    }
                 }
             }
             return "Student RollNo And Section Assigned Successfully";

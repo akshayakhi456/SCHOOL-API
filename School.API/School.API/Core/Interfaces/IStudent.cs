@@ -11,10 +11,11 @@ namespace School.API.Core.Interfaces
         Task<bool> create(StudentGuardianRequest student);
         Task<bool> update(StudentGuardianRequest student);
         List<StudentGuardianRequest> GetStudentsByRole(string role, string email);
-        List<StudentGuardianRequest> StudentsByClassName(string className);
+        List<StudentGuardianRequest> StudentsByClassName(int className);
         string ApplyLeave(StudentLeave studentLeave);
         string ApproveLeave(int id);
         List<StudentLeave> GetStudentLeave(int academicYearId, int sid);
-        List<StudentLeave> GetStudentLeaveForTeacher(int academicYearId, int classId, int? section);
+        List<studentApprovalResponse> GetStudentLeaveForTeacher(int academicYearId, int classId, int? section);
+        Task<string> StudentBulkUpload(List<StudentRequestModel> StudentRequestModel);
     }
 }

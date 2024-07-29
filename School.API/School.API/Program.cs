@@ -91,7 +91,7 @@ builder.Services.AddAuthorization(options =>
 
 
 // Inject app Dependencies (Dependency Injection)
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddScoped<IStudent, StudentService>();
 builder.Services.AddScoped<IEnquiry, EnquiryService>();
 builder.Services.AddScoped<IExpenses, ExpensesService>();
@@ -105,7 +105,7 @@ builder.Services.AddScoped<IAuthUser, AuthUserService>();
 builder.Services.AddScoped<ISendMail, MailSend>();
 builder.Services.AddScoped<ISubject, SubjectService>();
 builder.Services.AddScoped<IExam, ExamService>();
-
+builder.Services.AddScoped<ITitleHeader, TitleHeaderService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

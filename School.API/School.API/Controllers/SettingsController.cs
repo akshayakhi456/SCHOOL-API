@@ -239,7 +239,7 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("paymentAllotment/{className}")]
-        public IActionResult GetPaymentAllotment(string className)
+        public IActionResult GetPaymentAllotment(int className)
         {
             try
             {

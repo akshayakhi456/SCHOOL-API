@@ -5,7 +5,7 @@ namespace School.API.Core.Interfaces
 {
     public interface ITeacher
     {
-        string create(AddTeacherRequest addTeacherRequest);
+        Task<string> create(AddTeacherRequest addTeacherRequest);
         string update(AddTeacherRequest updateTeacherRequest);
         string delete(int id);
         string employmentApproval(int id);

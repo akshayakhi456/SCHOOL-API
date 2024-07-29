@@ -24,7 +24,7 @@ namespace School.API.Controllers
             try
             {
                 var result = _teacherService.create(addTeacherRequest);
-                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Employee Create", result));
+                return StatusCode(200, new APIResponse<string>((int)HttpStatusCode.OK, "Employee Create", result.Result));
             }
             catch(Exception ex)
             {
