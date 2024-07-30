@@ -56,7 +56,7 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _subject.getMarksByClass(classId, sectionId, acedemicYearId,subjectId,examId);
+                var res = _subject.getMarksByClass(classId, sectionId, acedemicYearId, subjectId, examId);
                 return StatusCode(200, new APIResponse<List<MarksRequestModel>>((int)HttpStatusCode.OK, "Subject Marks list", res));
             }
             catch (Exception ex)
@@ -129,7 +129,7 @@ namespace School.API.Controllers
 
         [HttpGet]
         [Route("classSubject")]
-        public IActionResult GetSubjectExam([FromQuery]int academicYearId,int classId)
+        public IActionResult GetSubjectExam([FromQuery] int academicYearId, int classId)
         {
             try
             {
@@ -179,8 +179,23 @@ namespace School.API.Controllers
         {
             try
             {
-                var res = _subject.progressCardInfo(classId, sectionId, examId,acedemicYearId, sid);
+                var res = _subject.progressCardInfo(classId, sectionId, examId, acedemicYearId, sid);
                 return StatusCode(200, new APIResponse<List<ProgressCardResponseModel>>((int)HttpStatusCode.OK, "Marks for Student wise", res));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route("StudentHallTicket")]
+        public IActionResult StudentHallTicket([FromQuery] int? classId, int? sectionId, int acedemicYearId, int examId, int? sid)
+        {
+            try
+            {
+                var res = _subject.hallTicketInfo(classId, sectionId, examId, acedemicYearId, sid);
+                return StatusCode(200, new APIResponse<List<HallTicketResponseModel>>((int)HttpStatusCode.OK, "HallTicket for Student wise", res));
             }
             catch (Exception ex)
             {

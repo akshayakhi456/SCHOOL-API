@@ -18,5 +18,6 @@ namespace School.API.Core.Interfaces
         string deleteClassSubjectWithTeacherAssign(int id);
         IReadOnlyList<ClassWiseSubjectResponse> getClassSubject(int academicYearId, int classId);
         List<ProgressCardResponseModel> progressCardInfo(int? ClassesId, int? SectionId, int? ExamId, int AcademicYearId, int? sid);
+        List<HallTicketResponseModel> hallTicketInfo(int? ClassesId, int? SectionId, int? ExamId, int AcademicYearId, int? sid);
     }
 }

@@ -137,6 +137,67 @@ namespace School.API.Core.Services
             return progressCardResponse;
         }
 
+        public List<HallTicketResponseModel> hallTicketInfo(int? ClassesId, int? SectionId, int? ExamId, int AcademicYearId, int? sid)
+        {
+            var studentList = _applicationDbContext.StudentClassSections
+                .AsNoTracking()
+                .Include(x => x.Students)
+                .Include(x => x.Section)
+                .ThenInclude(x => x.Classes)
+                .Where(x => ((x.ClassId == ClassesId
+                && (x.SectionId == SectionId || SectionId != null))
+                || x.Studentsid == sid)
+                && x.AcademicYearId == AcademicYearId)
+                .Distinct()
+                .ToList();
+            var guardians = (from student in studentList
+                             join guardian in _applicationDbContext.Guardians on student.Studentsid equals guardian.studentId
+                             select new { guardian }).ToList();
+            var studentInfo = new List<StudentInfo>();
+            foreach (var item in studentList)
+            {
+                var FatherGuardian = guardians.Where(x => x.guardian.studentId == item.Studentsid && x.guardian.relationship == "Father").ToList();
+                var motherGuardian = guardians.Where(x => x.guardian.studentId == item.Studentsid && x.guardian.relationship == "Mother").ToList();
+
+                var std = new StudentInfo();
+                std.FatherName = FatherGuardian.Count() > 0 ? $"{FatherGuardian[0].guardian.FirstName} {FatherGuardian[0].guardian.LastName}" : "";
+                std.MotherName = motherGuardian.Count() > 0 ? $"{motherGuardian[0].guardian.FirstName} {motherGuardian[0].guardian.LastName}" : "";
+                std.DateOfBirth = item.Students.dob;
+                std.Id = item.Id;
+                std.RollNo = item.RollNo;
+                std.Section = item.Section.section;
+                std.StudentName = $"{item.Students.firstName} {item.Students.lastName}";
+                std.AdmNo = item.Students.id;
+                std.ClassName = item.Section.Classes.className;
+                studentInfo.Add(std);
+            }
+
+            if (sid > 0)
+            {
+                ClassesId = studentList.FirstOrDefault(x => x.Studentsid == sid).ClassId;
+            }
+
+            var progressCardResponse = new List<HallTicketResponseModel>();
+            foreach (var item in studentInfo)
+            {
+                var cardResponse = new HallTicketResponseModel();
+                var subjectInfo = _applicationDbContext.StudentMarks
+                                  .Where(x => x.AcedamicYearId == AcademicYearId && x.ExamId == ExamId && (x.Sid == sid || sid == null))
+                                  .SelectMany(x => _applicationDbContext.ExamSubjectSchedules
+                                          .Where(ess => ess.SubjectId == x.SubjectId && ess.ClassId == ClassesId && ess.Id == ExamId)
+                                          .Select(ess => new SubjectDetail
+                                          {
+                                              ExamDate = ess.ExamDate.ToString("dd-MM-yyyy") +" "+ ess.ExamTime,
+                                              SubjectName = x.Subject.SubjectName,
+                                          }))
+                                      .ToList();
+                cardResponse.StudentInfo = item;
+                cardResponse.SubjectInfos = subjectInfo;
+                progressCardResponse.Add(cardResponse);
+            }
+            return progressCardResponse;
+        }
+
         public IReadOnlyList<ClassWiseSubjectResponse> getClassSubject(int academicYearId, int classId)
         {
             return _applicationDbContext.ClassWiseSubjects

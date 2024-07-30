@@ -109,12 +109,14 @@ namespace School.API.Core.Services
             if (Int32.TryParse(key, out int parsedId))
             {
                 studentRecord = _applicationDbContext.Students
+                    .Include(std => std.classes)
                     .Where(x => x.id == parsedId)
                     .ToList();
             }
             else
             {
                 studentRecord = _applicationDbContext.Students
+                    .Include(std => std.classes)
                     .Where(x =>
                         EF.Functions.Like(x.firstName, $"{key}%") ||
                         EF.Functions.Like(x.lastName, $"{key}%"))
@@ -133,6 +135,7 @@ namespace School.API.Core.Services
                     if (item is Students)
                     {
                         item.photo = this.GetImage(Convert.ToBase64String(item.photo));
+                        item.classesId = item.classes.Id;
                     }
                     else
                     {
