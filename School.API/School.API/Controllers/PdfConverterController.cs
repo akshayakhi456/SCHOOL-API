@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 //using PdfSharpCore;
 //using PdfSharpCore.Pdf;
 //using TheArtOfDev.HtmlRenderer.PdfSharp;
@@ -7,6 +8,7 @@ namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PdfConverterController : ControllerBase
     {
         [HttpGet]

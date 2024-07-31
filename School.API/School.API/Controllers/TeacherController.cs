@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
 using School.API.Core.Models.TeacherRequestResponseModel;
@@ -9,6 +10,7 @@ namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TeacherController : ControllerBase
     {
         private readonly IHttpContextAccessor _contextAccessor;

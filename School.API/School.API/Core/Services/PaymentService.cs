@@ -2,7 +2,6 @@
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
 using School.API.Core.Models.PaymentRequestResponseModel;
-using School.API.Migrations;
 
 namespace School.API.Core.Services
 {

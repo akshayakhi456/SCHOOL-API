@@ -7,11 +7,13 @@ using School.API.Core.Dtos;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using School.API.Core.Middleware;
+using Microsoft.AspNetCore.Authorization;
 
 namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AuthUserController : ControllerBase
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

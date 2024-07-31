@@ -11,7 +11,7 @@ namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class PaymentsController : ControllerBase
     {
         private readonly IPayment _payment;

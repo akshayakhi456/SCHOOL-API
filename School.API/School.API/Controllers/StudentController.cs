@@ -4,19 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using School.API.Core.Entities;
 using School.API.Core.Interfaces;
-using School.API.Core.Middleware;
 using School.API.Core.Models.StudentRequestModel;
 using School.API.Core.Models.Wrappers;
 using System.Net;
 using System.Security.Claims;
-using static System.Collections.Specialized.BitVector32;
 
 
 namespace School.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize]
+    [Authorize]
     public class StudentController : Controller
     {
         private readonly IStudent _studentService;

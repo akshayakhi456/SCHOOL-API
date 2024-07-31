@@ -28,8 +28,8 @@ builder.Services.AddSwaggerGen();
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
-    options.UseSqlServer(connectionString);
+    var connectionString = builder.Configuration.GetConnectionString("mysql");
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
 // Add Identity
@@ -149,7 +149,7 @@ builder.Services.AddCors(options =>
                       policy =>
                       {
                           policy.WithOrigins("http://localhost:4200",
-                                              "http://www.contoso.com")
+                                              "http://localhost:82")
                                                 .AllowAnyHeader()
                                                 .AllowAnyMethod();
                       });
@@ -159,11 +159,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 

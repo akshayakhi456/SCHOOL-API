@@ -12,8 +12,6 @@ using System.Text;
 using System;
 using School.API.Core.UtilityServices;
 using School.API.Core.UtilityServices.interfaces;
-using System.Linq;
-using School.API.Migrations;
 using static System.Collections.Specialized.BitVector32;
 using AutoMapper;
 
