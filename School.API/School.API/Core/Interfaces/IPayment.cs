@@ -14,5 +14,6 @@ namespace School.API.Core.Interfaces
         List<ClassWisePaymentResponseModel> yearWisePayment(int yearId);
 
         IEnumerable<PaymentOfClassWiseStudentsResponseModel> GetStudentPaymentDataByClassOrSection(PaymentOfClassWiseStudentsRequestModel requestModel);
+        List<StudentComingWeekPaymentResponseModel> StudentComingWeekPayment();
     }
 }

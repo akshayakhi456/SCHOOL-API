@@ -1,4 +1,6 @@
-﻿namespace School.API.Core.Models.DashoboardRequestResponseModel
+﻿using School.API.Core.Models.PaymentRequestResponseModel;
+
+namespace School.API.Core.Models.DashoboardRequestResponseModel
 {
     public class DashboardResponse
     {
@@ -9,5 +11,6 @@
         public int newAdmissionToday { get; set; } = 0;
         public int newAdmissionThisWeek { get; set; }
         public int newAdmissionThisMonth { get; set; }
+        public List<StudentComingWeekPaymentResponseModel> studentComingWeekPaymentResponse { get; set; }
     }
 }

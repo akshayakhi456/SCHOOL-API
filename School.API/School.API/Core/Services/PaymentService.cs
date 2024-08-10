@@ -5,10 +5,11 @@ using School.API.Core.Models.PaymentRequestResponseModel;
 
 namespace School.API.Core.Services
 {
-    public class PaymentService: IPayment
+    public class PaymentService : IPayment
     {
-        private readonly  ApplicationDbContext _applicationDbContext;
-        public PaymentService(ApplicationDbContext applicationDbContext) {
+        private readonly ApplicationDbContext _applicationDbContext;
+        public PaymentService(ApplicationDbContext applicationDbContext)
+        {
             _applicationDbContext = applicationDbContext;
         }
 
@@ -33,7 +34,7 @@ namespace School.API.Core.Services
                        where payment.paymentName == paymentAllotment.paymentName
                        select new PaymentResponseModel
                        {
-                           invoiceId =  payment.invoiceId,
+                           invoiceId = payment.invoiceId,
                            paymentName = payment.paymentName,
                            studentId = payment.studentId,
                            amount = payment.amount,
@@ -53,7 +54,7 @@ namespace School.API.Core.Services
             var res = (from payment in _applicationDbContext.Payments
                        join paymentAllotment in _applicationDbContext.paymentAllotments on payment.PaymentAllotmentId equals paymentAllotment.id
                        join paymentDetail in _applicationDbContext.PaymentTransactionDetails on payment.invoiceId equals paymentDetail.invoiceId into transaction
-                       from paymentDetails in  transaction.DefaultIfEmpty()
+                       from paymentDetails in transaction.DefaultIfEmpty()
                        where payment.studentId == id
                        select new PaymentResponseModel
                        {
@@ -76,7 +77,7 @@ namespace School.API.Core.Services
         public List<ClassWisePaymentResponseModel> classWisePayment(int yearId)
         {
             var records = StudentPaymentRecords(yearId);
-            
+
             var classWiseStudentCount = from std in _applicationDbContext.Students
                                         group std by std.classesId into className
                                         select new
@@ -85,7 +86,7 @@ namespace School.API.Core.Services
                                             classId = className.First().classes.Id,
                                             count = className.Count()
                                         };
-            
+
             var paymentAllotmentTotalClassWise = _applicationDbContext.paymentAllotments
                             .Where(x => x.acedamicYearId == yearId && classWiseStudentCount.Any(y => y.classId == x.classId))
                             .GroupBy(paymentAllotment => paymentAllotment.classId).ToList();
@@ -109,7 +110,7 @@ namespace School.API.Core.Services
                 ClassWisePaymentResponseModel model = new ClassWisePaymentResponseModel();
                 model.classId = record.ClassId;
                 model.className = record.ClassName;
-                
+
                 var classWiseSumItem = classWiseSum.FirstOrDefault(x => x.classId == record.ClassId);
                 if (classWiseSumItem != null)
                 {
@@ -150,30 +151,30 @@ namespace School.API.Core.Services
         public List<PaymentResponseModel> StudentPaymentRecords(int yearId)
         {
             return (from payment in _applicationDbContext.Payments
-             join paymentAllotment in _applicationDbContext.paymentAllotments on payment.PaymentAllotmentId equals paymentAllotment.id
-             where payment.acedamicYearId == yearId
-             select new PaymentResponseModel
-             {
-                 invoiceId = payment.invoiceId,
-                 paymentName = payment.paymentName,
-                 studentId = payment.studentId,
-                 amount = payment.amount,
-                 dateOfPayment = payment.dateOfPayment,
-                 paymentAllotmentAmount = paymentAllotment.amount,
-                 remarks = payment.remarks,
-                 paymentType = payment.paymentType,
-                 paymentAllotmentId = paymentAllotment.id,
-                 classId = paymentAllotment.classId,
-                 academicYears = paymentAllotment.acedamicYearId
-             }
+                    join paymentAllotment in _applicationDbContext.paymentAllotments on payment.PaymentAllotmentId equals paymentAllotment.id
+                    where payment.acedamicYearId == yearId
+                    select new PaymentResponseModel
+                    {
+                        invoiceId = payment.invoiceId,
+                        paymentName = payment.paymentName,
+                        studentId = payment.studentId,
+                        amount = payment.amount,
+                        dateOfPayment = payment.dateOfPayment,
+                        paymentAllotmentAmount = paymentAllotment.amount,
+                        remarks = payment.remarks,
+                        paymentType = payment.paymentType,
+                        paymentAllotmentId = paymentAllotment.id,
+                        classId = paymentAllotment.classId,
+                        academicYears = paymentAllotment.acedamicYearId
+                    }
              ).ToList();
         }
 
         public IEnumerable<PaymentOfClassWiseStudentsResponseModel> GetStudentPaymentDataByClassOrSection(PaymentOfClassWiseStudentsRequestModel requestModel)
         {
             var studentRecords = (from student in _applicationDbContext.Students
-                                    where student.classesId == requestModel.classId && (student.section == requestModel.section || requestModel.section == null)
-                                    select student).ToList();
+                                  where student.classesId == requestModel.classId && (student.section == requestModel.section || requestModel.section == null)
+                                  select student).ToList();
             var studentIds = studentRecords.Select(x => x.id).ToList();
             var paymentsRecords = from payment in _applicationDbContext.Payments
                                   where payment.acedamicYearId == requestModel.academicYearId
@@ -187,23 +188,40 @@ namespace School.API.Core.Services
                                         receivedAmount = y.Sum(c => c.amount),
                                     });
             var paymentAllotments = (from paymentAllotment in _applicationDbContext.paymentAllotments
-                                    where requestModel.PaymentAllotmentId.Contains(paymentAllotment.id)
-                                    && paymentAllotment.classId == requestModel.classId
-                                    select paymentAllotment).ToList();
+                                     where requestModel.PaymentAllotmentId.Contains(paymentAllotment.id)
+                                     && paymentAllotment.classId == requestModel.classId
+                                     select paymentAllotment).ToList();
             var totalAmount = paymentAllotments.Sum(c => long.Parse(c.amount));
             var studentPayments = (from student in studentRecords
-                                  join sPayment in sumOfStudentPayment on student.id equals sPayment.studentId
-                                  into joinedData
-                                  from sPayment in joinedData.DefaultIfEmpty()
-                                  select new PaymentOfClassWiseStudentsResponseModel
-                                  {
-                                      studentId = student.id,
-                                      studentName = student.firstName + " " + student.lastName,
-                                      pendingAmount = sPayment != null ? totalAmount - sPayment.receivedAmount : totalAmount,
-                                      actualAmount = totalAmount,
-                                      receivedAmount = sPayment != null ? sPayment.receivedAmount : 0
-                                  }).OrderBy(x => x.studentName).ToList();
+                                   join sPayment in sumOfStudentPayment on student.id equals sPayment.studentId
+                                   into joinedData
+                                   from sPayment in joinedData.DefaultIfEmpty()
+                                   select new PaymentOfClassWiseStudentsResponseModel
+                                   {
+                                       studentId = student.id,
+                                       studentName = student.firstName + " " + student.lastName,
+                                       pendingAmount = sPayment != null ? totalAmount - sPayment.receivedAmount : totalAmount,
+                                       actualAmount = totalAmount,
+                                       receivedAmount = sPayment != null ? sPayment.receivedAmount : 0
+                                   }).OrderBy(x => x.studentName).ToList();
             return studentPayments;
+        }
+
+        public List<StudentComingWeekPaymentResponseModel> StudentComingWeekPayment()
+        {
+            var studentPayment = _applicationDbContext.Payments.Join(_applicationDbContext.Students,
+                payment => payment.studentId,
+                studentDetail => studentDetail.id,
+                (payment, studentDetail) => new StudentComingWeekPaymentResponseModel 
+                {
+                    Class = studentDetail.classes.className,
+                    PaymentDate = payment.dateOfPayment,
+                    Section = studentDetail.section,
+                    StudentName = studentDetail.firstName + " " + studentDetail.lastName,
+                }
+                );
+
+            return null;
         }
     }
 }

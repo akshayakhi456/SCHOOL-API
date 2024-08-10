@@ -33,6 +33,10 @@ namespace School.API.Core.Services
             var recordsLastMonth = studentRecord
               .Where(entity => entity.dateOfJoining.Date >= firstDayOfLastMonth && entity.dateOfJoining.Date <= lastDayOfLastMonth).ToList().Count;
 
+            DateTime currWeek = currDate.AddDays(7).Date;
+
+            var studentComingWeekPaymentResponse = _paymentService.StudentComingWeekPayment();
+
             var feeCollection = (List<ClassWisePaymentResponseModel>)_paymentService.yearWisePayment(yearId);
             var feePending = feeCollection[0].pendingAmount;
             var feeReceivedAmount = feeCollection[0].receivedAmount;
@@ -44,7 +48,8 @@ namespace School.API.Core.Services
                 newAdmissionThisMonth = recordsLastMonth,
                 newAdmissionThisWeek = recordsLastWeek,
                 newAdmissionToday = todaynewAdmission,
-                newStudents = newStudents
+                newStudents = newStudents,
+                studentComingWeekPaymentResponse = studentComingWeekPaymentResponse
             };
         }
     }
