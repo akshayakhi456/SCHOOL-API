@@ -144,6 +144,16 @@ namespace School.API.Core.Services
             return "Updated Successfully";
         }
 
+        public string deleteEnquiryQuestion(int id)
+        {
+            var record = _applicationDbContext.enquiryQuestions.FirstOrDefault(eq => eq.id == id);
+            if (record == null)
+                throw new EntityInvalidException("Subject Delete", "Subject not found");
+            _applicationDbContext.enquiryQuestions.Remove(record);
+            _applicationDbContext.SaveChanges();
+            return "Enquiry Question Deleted Successfully";
+        }
+
         public List<PaymentAllotment> GetPaymentAllotments(int classId)
         {
             return _applicationDbContext.paymentAllotments.Where(x =>x.classId == classId).ToList();
@@ -206,7 +216,7 @@ namespace School.API.Core.Services
                 throw new EntityInvalidException("Subject Delete", "Subject not found");
             _applicationDbContext.Subjects.Remove(record);
             _applicationDbContext.SaveChanges();
-            return "Subject Updated Successfully";
+            return "Subject Deleted Successfully";
         }
 
         public List<Exam> getExams()

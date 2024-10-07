@@ -9,7 +9,6 @@ namespace School.API.Core.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         public string question { get; set; }
-        public string formControlName { get; set; }
         public string type { get; set; }
         public string options { get; set; }
         public bool isRequired { get; set; }

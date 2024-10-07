@@ -237,6 +237,21 @@ namespace School.API.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("enquiryQuestion/{id}")]
+        public IActionResult DeleteEnquiryQuestion(int id)
+        {
+            try
+            {
+                String res = (_settings.deleteEnquiryQuestion(id));
+                return CreatedAtAction(nameof(GetClass), new { message = res });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>((int)HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
         [HttpGet]
         [Route("paymentAllotment/{className}")]
         public IActionResult GetPaymentAllotment(int className)
