@@ -204,6 +204,11 @@ namespace School.API.Core.Services
             var record = _applicationDbContext.Subjects.FirstOrDefault(sub => sub.Id == subject.Id);
             if (record == null)
                 throw new EntityInvalidException("Subject Update", "Subject not found");
+            var isSubjectExist = _applicationDbContext.Subjects.Any(x => x.SubjectName == subject.SubjectName);
+            if (isSubjectExist)
+            {
+                throw new EntityInvalidException("Subject Create", "Subject Already Exist");
+            }
             record.SubjectName = subject.SubjectName;
             _applicationDbContext.SaveChanges();
             return "Subject Updated Successfully";
@@ -230,7 +235,7 @@ namespace School.API.Core.Services
             var examExist = _applicationDbContext.Exams.FirstOrDefault(exam => exam.ExamName.Equals(exam.ExamName));
             if (examExist is Exam)
             {
-                Results.Conflict("Exam name already exist.");
+                throw new EntityInvalidException("Exam Create","Exam name already exist.");
             }
             _applicationDbContext.Exams.Add(exam);
             _applicationDbContext.SaveChanges();
@@ -242,7 +247,12 @@ namespace School.API.Core.Services
             var examExist = _applicationDbContext.Exams.FirstOrDefault(exam => exam.Id.Equals(exam.Id));
             if (examExist is not Exam)
             {
-                Results.Conflict("Exam name not found.");
+                throw new EntityInvalidException("Exam Update", "Exam name not found.");
+            }
+            var examDup = _applicationDbContext.Exams.FirstOrDefault(exam => exam.ExamName.Equals(exam.ExamName));
+            if (examDup is Exam)
+            {
+                throw new EntityInvalidException("Exam Update", "Exam name already exist.");
             }
             examExist.ExamName = exam.ExamName;
             _applicationDbContext.SaveChanges();

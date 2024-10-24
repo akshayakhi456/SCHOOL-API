@@ -8,6 +8,7 @@ namespace School.API.Core.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
+        [MaxLength(255,ErrorMessage = "Question must not be exceed 255 characters")]
         public string question { get; set; }
         public string type { get; set; }
         public string options { get; set; }
